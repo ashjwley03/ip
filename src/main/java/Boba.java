@@ -126,12 +126,31 @@ public class Boba {
                             System.out.println("    Now you have " + taskCount + " task(s) in the list~");
                         }
                     }
+                } else if (input.startsWith("delete ")) {
+                    int index = Integer.parseInt(input.substring(7)) - 1;
+                    if (index < 0 || index >= taskCount) {
+                        System.out.println("    Hmm that task doesn't exist!");
+                        System.out.println("    You have " + taskCount + " task(s) btw~");
+                    } else {
+                        Task removed = tasks[index];
+                        for (int i = index; i < taskCount - 1; i++) {
+                            tasks[i] = tasks[i + 1];
+                        }
+                        tasks[taskCount - 1] = null;
+                        taskCount--;
+                        System.out.println("    Alright, I've removed this task~");
+                        System.out.println("      " + removed);
+                        System.out.println("    Now you have " + taskCount + " task(s) in the list.");
+                    }
+                } else if (input.equals("delete")) {
+                    System.out.println("    Which task tho?");
+                    System.out.println("    Try: delete <task number>");
                 } else if (input.equals("mark") || input.equals("unmark")) {
                     System.out.println("    Which task tho?");
                     System.out.println("    Try: " + input + " <task number>");
                 } else {
                     System.out.println("    Hmm I don't know that one~");
-                    System.out.println("    Try: todo, deadline, event, list, mark, unmark, or bye!");
+                    System.out.println("    Try: todo, deadline, event, list, mark, unmark, delete, or bye!");
                 }
             } catch (NumberFormatException e) {
                 System.out.println("    That's not a number silly~");
