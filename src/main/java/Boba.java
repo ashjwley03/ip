@@ -14,8 +14,7 @@ public class Boba {
         String line = "✿═══════════════════════════════════════════════✿";
 
         // Task storage
-        String[] tasks = new String[100];
-        boolean[] isDone = new boolean[100];
+        Task[] tasks = new Task[100];
         int taskCount = 0;
 
         // Greeting
@@ -41,25 +40,47 @@ public class Boba {
             if (input.equals("list")) {
                 System.out.println("    Okie here's everything on your plate~ 🍡");
                 for (int i = 0; i < taskCount; i++) {
-                    String status = isDone[i] ? "[X]" : "[ ]";
-                    System.out.println("    " + (i + 1) + "." + status + " " + tasks[i]);
+                    System.out.println("    " + (i + 1) + "." + tasks[i]);
                 }
             } else if (input.startsWith("mark ")) {
                 int index = Integer.parseInt(input.substring(5)) - 1;
-                isDone[index] = true;
+                tasks[index].markAsDone();
                 System.out.println("    Yay you did it!! ☆ﾟ.*･｡ﾟ");
-                System.out.println("    [X] " + tasks[index]);
+                System.out.println("    " + tasks[index]);
             } else if (input.startsWith("unmark ")) {
                 int index = Integer.parseInt(input.substring(7)) - 1;
-                isDone[index] = false;
+                tasks[index].markAsNotDone();
                 System.out.println("    No worries, we all need more time sometimes~");
-                System.out.println("    [ ] " + tasks[index]);
-            } else {
-                tasks[taskCount] = input;
-                isDone[taskCount] = false;
+                System.out.println("    " + tasks[index]);
+            } else if (input.startsWith("todo ")) {
+                String description = input.substring(5);
+                tasks[taskCount] = new Todo(description);
                 taskCount++;
-                System.out.println("    Got it! I've added this to your list 📝");
-                System.out.println("    " + tasks[taskCount - 1]);
+                System.out.println("    Got it! I've added this task ✿");
+                System.out.println("      " + tasks[taskCount - 1]);
+                System.out.println("    Now you have " + taskCount + " task(s) in the list~");
+            } else if (input.startsWith("deadline ")) {
+                String[] parts = input.substring(9).split(" /by ");
+                String description = parts[0];
+                String by = parts[1];
+                tasks[taskCount] = new Deadline(description, by);
+                taskCount++;
+                System.out.println("    Got it! I've added this task ✿");
+                System.out.println("      " + tasks[taskCount - 1]);
+                System.out.println("    Now you have " + taskCount + " task(s) in the list~");
+            } else if (input.startsWith("event ")) {
+                String[] parts = input.substring(6).split(" /from ");
+                String description = parts[0];
+                String[] timeParts = parts[1].split(" /to ");
+                String from = timeParts[0];
+                String to = timeParts[1];
+                tasks[taskCount] = new Event(description, from, to);
+                taskCount++;
+                System.out.println("    Got it! I've added this task ✿");
+                System.out.println("      " + tasks[taskCount - 1]);
+                System.out.println("    Now you have " + taskCount + " task(s) in the list~");
+            } else {
+                System.out.println("    " + input);
             }
 
             System.out.println(line);
