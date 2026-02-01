@@ -13,6 +13,10 @@ public class Boba {
 
         String line = "✿═══════════════════════════════════════════════✿";
 
+        // Task storage
+        String[] tasks = new String[100];
+        int taskCount = 0;
+
         // Greeting
         System.out.println(line);
         System.out.println(logo);
@@ -20,7 +24,7 @@ public class Boba {
         System.out.println("    What can I do for you today?");
         System.out.println(line);
 
-        // Read and echo user input
+        // Read and process user input
         Scanner scanner = new Scanner(System.in);
         String input;
 
@@ -32,7 +36,18 @@ public class Boba {
             }
 
             System.out.println(line);
-            System.out.println("    " + input);
+
+            if (input.equals("list")) {
+                System.out.println("    Here's your list! ✿");
+                for (int i = 0; i < taskCount; i++) {
+                    System.out.println("    " + (i + 1) + ". " + tasks[i]);
+                }
+            } else {
+                tasks[taskCount] = input;
+                taskCount++;
+                System.out.println("    added: " + input);
+            }
+
             System.out.println(line);
         }
 
