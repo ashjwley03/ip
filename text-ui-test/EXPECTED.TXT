@@ -1,7 +1,77 @@
-Hello from
- ____        _        
-|  _ \ _   _| | _____ 
-| | | | | | | |/ / _ \
-| |_| | |_| |   <  __/
-|____/ \__,_|_|\_\___|
+✿═══════════════════════════════════════════════✿
 
+    ██████╗  ██████╗ ██████╗  █████╗ 
+    ██╔══██╗██╔═══██╗██╔══██╗██╔══██╗
+    ██████╔╝██║   ██║██████╔╝███████║
+    ██╔══██╗██║   ██║██╔══██╗██╔══██║
+    ██████╔╝╚██████╔╝██████╔╝██║  ██║
+    ╚═════╝  ╚═════╝ ╚═════╝ ╚═╝  ╚═╝
+          ☆ your bubbly assistant ☆
+
+    Hii! I'm Boba ◕‿◕
+    What can I do for you today?
+✿═══════════════════════════════════════════════✿
+✿═══════════════════════════════════════════════✿
+    Got it! I've added this task ✿
+      [T][ ] read book
+    Now you have 1 task(s) in the list~
+✿═══════════════════════════════════════════════✿
+✿═══════════════════════════════════════════════✿
+    Got it! I've added this task ✿
+      [T][ ] return book
+    Now you have 2 task(s) in the list~
+✿═══════════════════════════════════════════════✿
+✿═══════════════════════════════════════════════✿
+    Got it! I've added this task ✿
+      [D][ ] submit assignment (by: Sunday)
+    Now you have 3 task(s) in the list~
+✿═══════════════════════════════════════════════✿
+✿═══════════════════════════════════════════════✿
+    Got it! I've added this task ✿
+      [E][ ] project meeting (from: Mon 2pm to: 4pm)
+    Now you have 4 task(s) in the list~
+✿═══════════════════════════════════════════════✿
+✿═══════════════════════════════════════════════✿
+    Okie here's everything on your plate~ 🍡
+    1.[T][ ] read book
+    2.[T][ ] return book
+    3.[D][ ] submit assignment (by: Sunday)
+    4.[E][ ] project meeting (from: Mon 2pm to: 4pm)
+✿═══════════════════════════════════════════════✿
+✿═══════════════════════════════════════════════✿
+    Yay you did it!! ☆ﾟ.*･｡ﾟ
+    [T][X] read book
+✿═══════════════════════════════════════════════✿
+✿═══════════════════════════════════════════════✿
+    Okie here's everything on your plate~ 🍡
+    1.[T][X] read book
+    2.[T][ ] return book
+    3.[D][ ] submit assignment (by: Sunday)
+    4.[E][ ] project meeting (from: Mon 2pm to: 4pm)
+✿═══════════════════════════════════════════════✿
+✿═══════════════════════════════════════════════✿
+    No worries, we all need more time sometimes~
+    [T][ ] read book
+✿═══════════════════════════════════════════════✿
+✿═══════════════════════════════════════════════✿
+    Alright, I've removed this task~
+      [T][ ] return book
+    Now you have 3 task(s) in the list.
+✿═══════════════════════════════════════════════✿
+✿═══════════════════════════════════════════════✿
+    Okie here's everything on your plate~ 🍡
+    1.[T][ ] read book
+    2.[D][ ] submit assignment (by: Sunday)
+    3.[E][ ] project meeting (from: Mon 2pm to: 4pm)
+✿═══════════════════════════════════════════════✿
+✿═══════════════════════════════════════════════✿
+    Hmm I don't know that one~
+    Try: todo, deadline, event, list, mark, unmark, delete, or bye!
+✿═══════════════════════════════════════════════✿
+✿═══════════════════════════════════════════════✿
+    Uhh what's the task? Can't be empty~
+    Try: todo <description>
+✿═══════════════════════════════════════════════✿
+✿═══════════════════════════════════════════════✿
+    Bye bye :) Hope to see you again soon! ♡
+✿═══════════════════════════════════════════════✿
