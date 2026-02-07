@@ -94,7 +94,7 @@ public class Storage {
             return "T | " + (task.isDone ? "1" : "0") + " | " + task.description;
         } else if (task instanceof Deadline) {
             Deadline d = (Deadline) task;
-            return "D | " + (task.isDone ? "1" : "0") + " | " + task.description + " | " + d.by;
+            return "D | " + (task.isDone ? "1" : "0") + " | " + task.description + " | " + d.getByForStorage();
         } else if (task instanceof Event) {
             Event e = (Event) task;
             return "E | " + (task.isDone ? "1" : "0") + " | " + task.description + " | " + e.from + " | " + e.to;
