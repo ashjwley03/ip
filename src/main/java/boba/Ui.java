@@ -1,3 +1,5 @@
+package boba;
+
 import java.util.Scanner;
 
 public class Ui {
