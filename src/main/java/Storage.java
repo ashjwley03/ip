@@ -1,6 +1,7 @@
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Storage {
@@ -10,8 +11,8 @@ public class Storage {
         this.filePath = filePath;
     }
 
-    public int load(Task[] tasks) {
-        int taskCount = 0;
+    public ArrayList<Task> load() throws BobException {
+        ArrayList<Task> tasks = new ArrayList<>();
         File file = new File(filePath);
 
         File parentDir = file.getParentFile();
@@ -20,7 +21,7 @@ public class Storage {
         }
 
         if (!file.exists()) {
-            return 0;
+            return tasks;
         }
 
         try {
@@ -29,16 +30,15 @@ public class Storage {
                 String line = scanner.nextLine();
                 Task task = parseTask(line);
                 if (task != null) {
-                    tasks[taskCount] = task;
-                    taskCount++;
+                    tasks.add(task);
                 }
             }
             scanner.close();
         } catch (IOException e) {
-            System.out.println("    Hmm couldn't load saved tasks~");
+            throw new BobException("Hmm couldn't load saved tasks~");
         }
 
-        return taskCount;
+        return tasks;
     }
 
     private Task parseTask(String line) {
@@ -70,7 +70,7 @@ public class Storage {
         }
     }
 
-    public void save(Task[] tasks, int taskCount) {
+    public void save(TaskList tasks) {
         try {
             File file = new File(filePath);
 
@@ -80,8 +80,8 @@ public class Storage {
             }
 
             FileWriter writer = new FileWriter(file);
-            for (int i = 0; i < taskCount; i++) {
-                writer.write(taskToString(tasks[i]) + "\n");
+            for (int i = 0; i < tasks.size(); i++) {
+                writer.write(taskToString(tasks.get(i)) + "\n");
             }
             writer.close();
         } catch (IOException e) {
