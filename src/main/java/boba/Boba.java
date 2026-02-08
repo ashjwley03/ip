@@ -8,6 +8,7 @@ public class Boba {
     private Storage storage;
     private TaskList tasks;
     private Ui ui;
+    private CheerLoader cheerLoader;
 
     /**
      * Creates a new Boba chatbot instance.
@@ -17,6 +18,7 @@ public class Boba {
     public Boba(String filePath) {
         ui = new Ui();
         storage = new Storage(filePath);
+        cheerLoader = new CheerLoader();
         try {
             tasks = new TaskList(storage.load());
         } catch (BobException e) {
@@ -115,9 +117,13 @@ public class Boba {
                         }
                         break;
 
+                    case "cheer":
+                        ui.showCheer(cheerLoader.getRandomQuote());
+                        break;
+
                     default:
                         ui.showError("Hmm I don't know that one~");
-                        ui.showError("Try: todo, deadline, event, list, mark, unmark, delete, find, or bye!");
+                        ui.showError("Try: todo, deadline, event, list, mark, unmark, delete, find, cheer, or bye!");
                         break;
                 }
             } catch (BobException e) {
