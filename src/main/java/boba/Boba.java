@@ -1,10 +1,19 @@
 package boba;
 
+/**
+ * Main class for the Boba chatbot application.
+ * Boba is a personal task manager that helps users track todos, deadlines, and events.
+ */
 public class Boba {
     private Storage storage;
     private TaskList tasks;
     private Ui ui;
 
+    /**
+     * Creates a new Boba chatbot instance.
+     *
+     * @param filePath The file path where tasks will be saved and loaded from.
+     */
     public Boba(String filePath) {
         ui = new Ui();
         storage = new Storage(filePath);
@@ -16,6 +25,9 @@ public class Boba {
         }
     }
 
+    /**
+     * Runs the main loop of the chatbot, processing user commands until exit.
+     */
     public void run() {
         ui.showWelcome();
         boolean isExit = false;
@@ -118,6 +130,11 @@ public class Boba {
         ui.close();
     }
 
+    /**
+     * Entry point for the Boba application.
+     *
+     * @param args Command line arguments (not used).
+     */
     public static void main(String[] args) {
         new Boba("./data/boba.txt").run();
     }

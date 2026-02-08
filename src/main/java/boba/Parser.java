@@ -1,11 +1,26 @@
 package boba;
 
+/**
+ * Provides utility methods for parsing user input commands.
+ */
 public class Parser {
 
+    /**
+     * Extracts the command word from user input.
+     *
+     * @param input The full user input string.
+     * @return The first word of the input (the command).
+     */
     public static String getCommand(String input) {
         return input.split(" ")[0];
     }
 
+    /**
+     * Extracts the arguments from user input (everything after the command).
+     *
+     * @param input The full user input string.
+     * @return The arguments portion of the input, or empty string if none.
+     */
     public static String getArguments(String input) {
         int spaceIndex = input.indexOf(" ");
         if (spaceIndex == -1) {
@@ -14,6 +29,14 @@ public class Parser {
         return input.substring(spaceIndex + 1).trim();
     }
 
+    /**
+     * Parses a task index from user input.
+     * Converts from 1-based user input to 0-based array index.
+     *
+     * @param input The full user input string containing the index.
+     * @return The 0-based index.
+     * @throws NumberFormatException If the index is not a valid number.
+     */
     public static int parseIndex(String input) throws NumberFormatException {
         String[] parts = input.split(" ");
         if (parts.length < 2) {
@@ -22,6 +45,13 @@ public class Parser {
         return Integer.parseInt(parts[1]) - 1;
     }
 
+    /**
+     * Parses arguments to create a Todo task.
+     *
+     * @param args The task description.
+     * @return A new Todo task.
+     * @throws BobException If the description is empty.
+     */
     public static Todo parseTodo(String args) throws BobException {
         if (args.isEmpty()) {
             throw new BobException("Uhh what's the task? Can't be empty~\n    Try: todo <description>");
@@ -29,6 +59,14 @@ public class Parser {
         return new Todo(args);
     }
 
+    /**
+     * Parses arguments to create a Deadline task.
+     * Expected format: "description /by deadline"
+     *
+     * @param args The arguments containing description and deadline.
+     * @return A new Deadline task.
+     * @throws BobException If the format is invalid or fields are missing.
+     */
     public static Deadline parseDeadline(String args) throws BobException {
         if (!args.contains(" /by ")) {
             throw new BobException("When's it due? Add /by <date>~\n    Try: deadline <description> /by <when>");
@@ -42,6 +80,14 @@ public class Parser {
         return new Deadline(description, by);
     }
 
+    /**
+     * Parses arguments to create an Event task.
+     * Expected format: "description /from start /to end"
+     *
+     * @param args The arguments containing description and time range.
+     * @return A new Event task.
+     * @throws BobException If the format is invalid or fields are missing.
+     */
     public static Event parseEvent(String args) throws BobException {
         if (!args.contains(" /from ") || !args.contains(" /to ")) {
             throw new BobException("I need both /from and /to times~\n    Try: event <description> /from <start> /to <end>");
