@@ -6,13 +6,28 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+/**
+ * Handles loading and saving tasks to a file.
+ */
 public class Storage {
     private String filePath;
 
+    /**
+     * Creates a new Storage with the specified file path.
+     *
+     * @param filePath The path to the file for storing tasks.
+     */
     public Storage(String filePath) {
         this.filePath = filePath;
     }
 
+    /**
+     * Loads tasks from the storage file.
+     * Creates the directory and file if they don't exist.
+     *
+     * @return An ArrayList of tasks loaded from the file.
+     * @throws BobException If there's an error reading the file.
+     */
     public ArrayList<Task> load() throws BobException {
         ArrayList<Task> tasks = new ArrayList<>();
         File file = new File(filePath);
@@ -43,6 +58,12 @@ public class Storage {
         return tasks;
     }
 
+    /**
+     * Parses a single line from the storage file into a Task object.
+     *
+     * @param line The line to parse.
+     * @return The parsed Task, or null if parsing fails.
+     */
     private Task parseTask(String line) {
         try {
             String[] parts = line.split(" \\| ");
@@ -61,6 +82,9 @@ public class Storage {
                 case "E":
                     task = new Event(description, parts[3], parts[4]);
                     break;
+                default:
+                    // Unknown task type, will return null
+                    break;
             }
 
             if (task != null && isDone) {
@@ -72,6 +96,11 @@ public class Storage {
         }
     }
 
+    /**
+     * Saves all tasks to the storage file.
+     *
+     * @param tasks The TaskList containing tasks to save.
+     */
     public void save(TaskList tasks) {
         try {
             File file = new File(filePath);
@@ -91,6 +120,12 @@ public class Storage {
         }
     }
 
+    /**
+     * Converts a Task to its string representation for storage.
+     *
+     * @param task The task to convert.
+     * @return The string representation for storage.
+     */
     private String taskToString(Task task) {
         if (task instanceof Todo) {
             return "T | " + (task.isDone ? "1" : "0") + " | " + task.description;
