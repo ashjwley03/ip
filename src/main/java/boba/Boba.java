@@ -106,9 +106,18 @@ public class Boba {
                         }
                         break;
 
+                    case "find":
+                        if (args.isEmpty()) {
+                            ui.showError("What should I search for?~");
+                            ui.showError("Try: find <keyword>");
+                        } else {
+                            ui.showFoundTasks(tasks.find(args));
+                        }
+                        break;
+
                     default:
                         ui.showError("Hmm I don't know that one~");
-                        ui.showError("Try: todo, deadline, event, list, mark, unmark, delete, or bye!");
+                        ui.showError("Try: todo, deadline, event, list, mark, unmark, delete, find, or bye!");
                         break;
                 }
             } catch (BobException e) {
