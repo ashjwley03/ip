@@ -1,5 +1,6 @@
 package boba;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
@@ -131,6 +132,22 @@ public class Ui {
      */
     public void showLoadingError() {
         System.out.println("    Hmm couldn't load saved tasks~");
+    }
+
+    /**
+     * Displays tasks that match a search keyword.
+     *
+     * @param matchingTasks The list of tasks that match the search.
+     */
+    public void showFoundTasks(ArrayList<Task> matchingTasks) {
+        if (matchingTasks.isEmpty()) {
+            System.out.println("    Hmm no tasks match that keyword~");
+        } else {
+            System.out.println("    Here are the matching tasks in your list~ ✿");
+            for (int i = 0; i < matchingTasks.size(); i++) {
+                System.out.println("    " + (i + 1) + "." + matchingTasks.get(i));
+            }
+        }
     }
 
     /**
