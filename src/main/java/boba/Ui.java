@@ -151,6 +151,15 @@ public class Ui {
     }
 
     /**
+     * Displays a motivational quote.
+     *
+     * @param quote The quote to display.
+     */
+    public void showCheer(String quote) {
+        System.out.println("    ✨ " + quote + " ✨");
+    }
+
+    /**
      * Closes the input scanner.
      */
     public void close() {
