@@ -1,4 +1,4 @@
-package boba;
+package boba.task;
 
 /**
  * Represents an event task with a start time and end time.
@@ -18,6 +18,24 @@ public class Event extends Task {
         super(description);
         this.from = from;
         this.to = to;
+    }
+
+    /**
+     * Returns the start time of this event.
+     *
+     * @return The start time.
+     */
+    public String getFrom() {
+        return from;
+    }
+
+    /**
+     * Returns the end time of this event.
+     *
+     * @return The end time.
+     */
+    public String getTo() {
+        return to;
     }
 
     /**

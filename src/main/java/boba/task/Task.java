@@ -1,4 +1,4 @@
-package boba;
+package boba.task;
 
 /**
  * Represents a task with a description and completion status.
@@ -40,6 +40,24 @@ public class Task {
      */
     public void markAsNotDone() {
         this.isDone = false;
+    }
+
+    /**
+     * Returns whether this task is done.
+     *
+     * @return True if task is done, false otherwise.
+     */
+    public boolean isDone() {
+        return isDone;
+    }
+
+    /**
+     * Returns the description of this task.
+     *
+     * @return The task description.
+     */
+    public String getDescription() {
+        return description;
     }
 
     /**

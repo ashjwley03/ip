@@ -1,4 +1,7 @@
-package boba;
+package boba.ui;
+
+import boba.task.Task;
+import boba.task.TaskList;
 
 import java.util.ArrayList;
 import java.util.Scanner;

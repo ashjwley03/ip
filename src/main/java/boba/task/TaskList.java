@@ -1,4 +1,4 @@
-package boba;
+package boba.task;
 
 import java.util.ArrayList;
 

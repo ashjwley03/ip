@@ -1,5 +1,16 @@
 package boba;
 
+import boba.exception.BobException;
+import boba.parser.Parser;
+import boba.storage.Storage;
+import boba.task.Deadline;
+import boba.task.Event;
+import boba.task.Task;
+import boba.task.TaskList;
+import boba.task.Todo;
+import boba.ui.Ui;
+import boba.util.CheerLoader;
+
 /**
  * Main class for the Boba chatbot application.
  * Boba is a personal task manager that helps users track todos, deadlines, and events.

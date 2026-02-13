@@ -1,4 +1,9 @@
-package boba;
+package boba.parser;
+
+import boba.exception.BobException;
+import boba.task.Deadline;
+import boba.task.Event;
+import boba.task.Todo;
 
 /**
  * Provides utility methods for parsing user input commands.

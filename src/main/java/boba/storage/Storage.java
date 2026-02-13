@@ -1,4 +1,11 @@
-package boba;
+package boba.storage;
+
+import boba.exception.BobException;
+import boba.task.Deadline;
+import boba.task.Event;
+import boba.task.Task;
+import boba.task.TaskList;
+import boba.task.Todo;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -128,13 +135,13 @@ public class Storage {
      */
     private String taskToString(Task task) {
         if (task instanceof Todo) {
-            return "T | " + (task.isDone ? "1" : "0") + " | " + task.description;
+            return "T | " + (task.isDone() ? "1" : "0") + " | " + task.getDescription();
         } else if (task instanceof Deadline) {
             Deadline d = (Deadline) task;
-            return "D | " + (task.isDone ? "1" : "0") + " | " + task.description + " | " + d.getByForStorage();
+            return "D | " + (task.isDone() ? "1" : "0") + " | " + task.getDescription() + " | " + d.getByForStorage();
         } else if (task instanceof Event) {
             Event e = (Event) task;
-            return "E | " + (task.isDone ? "1" : "0") + " | " + task.description + " | " + e.from + " | " + e.to;
+            return "E | " + (task.isDone() ? "1" : "0") + " | " + task.getDescription() + " | " + e.getFrom() + " | " + e.getTo();
         }
         return "";
     }

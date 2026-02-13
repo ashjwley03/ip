@@ -1,4 +1,4 @@
-package boba;
+package boba.exception;
 
 /**
  * Represents exceptions specific to the Boba chatbot.

@@ -1,4 +1,4 @@
-package boba;
+package boba.task;
 
 import org.junit.jupiter.api.Test;
 
