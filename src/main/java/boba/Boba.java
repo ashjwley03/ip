@@ -43,88 +43,88 @@ public class Boba {
 
             try {
                 switch (command) {
-                    case "bye":
-                        isExit = true;
-                        break;
+                case "bye":
+                    isExit = true;
+                    break;
 
-                    case "list":
-                        ui.showTaskList(tasks);
-                        break;
+                case "list":
+                    ui.showTaskList(tasks);
+                    break;
 
-                    case "mark":
-                        int markIndex = Parser.parseIndex(input);
-                        if (markIndex < 0 || markIndex >= tasks.size()) {
-                            ui.showError("Hmm that task doesn't exist!");
-                            ui.showError("You have " + tasks.size() + " task(s) btw~");
-                        } else {
-                            tasks.get(markIndex).markAsDone();
-                            storage.save(tasks);
-                            ui.showTaskMarked(tasks.get(markIndex));
-                        }
-                        break;
-
-                    case "unmark":
-                        int unmarkIndex = Parser.parseIndex(input);
-                        if (unmarkIndex < 0 || unmarkIndex >= tasks.size()) {
-                            ui.showError("Hmm that task doesn't exist!");
-                            ui.showError("You have " + tasks.size() + " task(s) btw~");
-                        } else {
-                            tasks.get(unmarkIndex).markAsNotDone();
-                            storage.save(tasks);
-                            ui.showTaskUnmarked(tasks.get(unmarkIndex));
-                        }
-                        break;
-
-                    case "todo":
-                        Todo todo = Parser.parseTodo(args);
-                        tasks.add(todo);
+                case "mark":
+                    int markIndex = Parser.parseIndex(input);
+                    if (markIndex < 0 || markIndex >= tasks.size()) {
+                        ui.showError("Hmm that task doesn't exist!");
+                        ui.showError("You have " + tasks.size() + " task(s) btw~");
+                    } else {
+                        tasks.get(markIndex).markAsDone();
                         storage.save(tasks);
-                        ui.showTaskAdded(todo, tasks.size());
-                        break;
+                        ui.showTaskMarked(tasks.get(markIndex));
+                    }
+                    break;
 
-                    case "deadline":
-                        Deadline deadline = Parser.parseDeadline(args);
-                        tasks.add(deadline);
+                case "unmark":
+                    int unmarkIndex = Parser.parseIndex(input);
+                    if (unmarkIndex < 0 || unmarkIndex >= tasks.size()) {
+                        ui.showError("Hmm that task doesn't exist!");
+                        ui.showError("You have " + tasks.size() + " task(s) btw~");
+                    } else {
+                        tasks.get(unmarkIndex).markAsNotDone();
                         storage.save(tasks);
-                        ui.showTaskAdded(deadline, tasks.size());
-                        break;
+                        ui.showTaskUnmarked(tasks.get(unmarkIndex));
+                    }
+                    break;
 
-                    case "event":
-                        Event event = Parser.parseEvent(args);
-                        tasks.add(event);
+                case "todo":
+                    Todo todo = Parser.parseTodo(args);
+                    tasks.add(todo);
+                    storage.save(tasks);
+                    ui.showTaskAdded(todo, tasks.size());
+                    break;
+
+                case "deadline":
+                    Deadline deadline = Parser.parseDeadline(args);
+                    tasks.add(deadline);
+                    storage.save(tasks);
+                    ui.showTaskAdded(deadline, tasks.size());
+                    break;
+
+                case "event":
+                    Event event = Parser.parseEvent(args);
+                    tasks.add(event);
+                    storage.save(tasks);
+                    ui.showTaskAdded(event, tasks.size());
+                    break;
+
+                case "delete":
+                    int deleteIndex = Parser.parseIndex(input);
+                    if (deleteIndex < 0 || deleteIndex >= tasks.size()) {
+                        ui.showError("Hmm that task doesn't exist!");
+                        ui.showError("You have " + tasks.size() + " task(s) btw~");
+                    } else {
+                        Task removed = tasks.delete(deleteIndex);
                         storage.save(tasks);
-                        ui.showTaskAdded(event, tasks.size());
-                        break;
+                        ui.showTaskDeleted(removed, tasks.size());
+                    }
+                    break;
 
-                    case "delete":
-                        int deleteIndex = Parser.parseIndex(input);
-                        if (deleteIndex < 0 || deleteIndex >= tasks.size()) {
-                            ui.showError("Hmm that task doesn't exist!");
-                            ui.showError("You have " + tasks.size() + " task(s) btw~");
-                        } else {
-                            Task removed = tasks.delete(deleteIndex);
-                            storage.save(tasks);
-                            ui.showTaskDeleted(removed, tasks.size());
-                        }
-                        break;
+                case "find":
+                    if (args.isEmpty()) {
+                        ui.showError("What should I search for?~");
+                        ui.showError("Try: find <keyword>");
+                    } else {
+                        ui.showFoundTasks(tasks.find(args));
+                    }
+                    break;
 
-                    case "find":
-                        if (args.isEmpty()) {
-                            ui.showError("What should I search for?~");
-                            ui.showError("Try: find <keyword>");
-                        } else {
-                            ui.showFoundTasks(tasks.find(args));
-                        }
-                        break;
+                case "cheer":
+                    ui.showCheer(cheerLoader.getRandomQuote());
+                    break;
 
-                    case "cheer":
-                        ui.showCheer(cheerLoader.getRandomQuote());
-                        break;
-
-                    default:
-                        ui.showError("Hmm I don't know that one~");
-                        ui.showError("Try: todo, deadline, event, list, mark, unmark, delete, find, cheer, or bye!");
-                        break;
+                default:
+                    ui.showError("Hmm I don't know that one~");
+                    ui.showError("Try: todo, deadline, event, list, mark, unmark, delete, find, cheer, or bye!");
+                    break;
                 }
             } catch (BobException e) {
                 ui.showError(e.getMessage());
