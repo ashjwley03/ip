@@ -74,13 +74,15 @@ public class Parser {
      */
     public static Deadline parseDeadline(String args) throws BobException {
         if (!args.contains(" /by ")) {
-            throw new BobException("When's it due? Add /by <date>~\n    Try: deadline <description> /by <when>");
+            throw new BobException("When's it due? Add /by <date>~\n"
+                    + "    Try: deadline <description> /by <when>");
         }
         String[] parts = args.split(" /by ");
         String description = parts[0].trim();
         String by = parts[1].trim();
         if (description.isEmpty() || by.isEmpty()) {
-            throw new BobException("Hmm something's missing there~\n    Try: deadline <description> /by <when>");
+            throw new BobException("Hmm something's missing there~\n"
+                    + "    Try: deadline <description> /by <when>");
         }
         return new Deadline(description, by);
     }
@@ -95,7 +97,8 @@ public class Parser {
      */
     public static Event parseEvent(String args) throws BobException {
         if (!args.contains(" /from ") || !args.contains(" /to ")) {
-            throw new BobException("I need both /from and /to times~\n    Try: event <description> /from <start> /to <end>");
+            throw new BobException("I need both /from and /to times~\n"
+                    + "    Try: event <description> /from <start> /to <end>");
         }
         String[] parts = args.split(" /from ");
         String description = parts[0].trim();
@@ -103,7 +106,8 @@ public class Parser {
         String from = timeParts[0].trim();
         String to = timeParts[1].trim();
         if (description.isEmpty() || from.isEmpty() || to.isEmpty()) {
-            throw new BobException("Hmm something's missing there~\n    Try: event <description> /from <start> /to <end>");
+            throw new BobException("Hmm something's missing there~\n"
+                    + "    Try: event <description> /from <start> /to <end>");
         }
         return new Event(description, from, to);
     }

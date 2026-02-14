@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE suppressions PUBLIC
+        "-//Checkstyle//DTD SuppressionFilter Configuration 1.2//EN"
+        "https://checkstyle.org/dtds/suppressions_1_2.dtd">
+
+<suppressions>
+    <!-- Suppress JavadocPackage checks for the entire project -->
+    <suppress checks="JavadocPackage" files="."/>
+    
+    <!-- Allow underscores in test method names -->
+    <suppress checks="MethodName" files="[\\/]test[\\/].+\.java$"/>
+</suppressions>
