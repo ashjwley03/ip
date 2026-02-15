@@ -65,8 +65,8 @@ public class Boba {
                 case "mark":
                     int markIndex = Parser.parseIndex(input);
                     if (markIndex < 0 || markIndex >= tasks.size()) {
-                        ui.showError("Hmm that task doesn't exist!");
-                        ui.showError("You have " + tasks.size() + " task(s) btw~");
+                        ui.showErrors("Hmm that task doesn't exist!",
+                                "You have " + tasks.size() + " task(s) btw~");
                     } else {
                         tasks.get(markIndex).markAsDone();
                         storage.save(tasks);
@@ -77,8 +77,8 @@ public class Boba {
                 case "unmark":
                     int unmarkIndex = Parser.parseIndex(input);
                     if (unmarkIndex < 0 || unmarkIndex >= tasks.size()) {
-                        ui.showError("Hmm that task doesn't exist!");
-                        ui.showError("You have " + tasks.size() + " task(s) btw~");
+                        ui.showErrors("Hmm that task doesn't exist!",
+                                "You have " + tasks.size() + " task(s) btw~");
                     } else {
                         tasks.get(unmarkIndex).markAsNotDone();
                         storage.save(tasks);
@@ -110,8 +110,8 @@ public class Boba {
                 case "delete":
                     int deleteIndex = Parser.parseIndex(input);
                     if (deleteIndex < 0 || deleteIndex >= tasks.size()) {
-                        ui.showError("Hmm that task doesn't exist!");
-                        ui.showError("You have " + tasks.size() + " task(s) btw~");
+                        ui.showErrors("Hmm that task doesn't exist!",
+                                "You have " + tasks.size() + " task(s) btw~");
                     } else {
                         Task removed = tasks.delete(deleteIndex);
                         storage.save(tasks);
@@ -121,8 +121,8 @@ public class Boba {
 
                 case "find":
                     if (args.isEmpty()) {
-                        ui.showError("What should I search for?~");
-                        ui.showError("Try: find <keyword>");
+                        ui.showErrors("What should I search for?~",
+                                "Try: find <keyword>");
                     } else {
                         ui.showFoundTasks(tasks.find(args));
                     }
@@ -133,18 +133,18 @@ public class Boba {
                     break;
 
                 default:
-                    ui.showError("Hmm I don't know that one~");
-                    ui.showError("Try: todo, deadline, event, list, mark, unmark, delete, find, cheer, or bye!");
+                    ui.showErrors("Hmm I don't know that one~",
+                            "Try: todo, deadline, event, list, mark, unmark, delete, find, cheer, or bye!");
                     break;
                 }
             } catch (BobException e) {
                 ui.showError(e.getMessage());
             } catch (NumberFormatException e) {
-                ui.showError("That's not a number silly~");
-                ui.showError("Try: " + command + " <number>");
+                ui.showErrors("That's not a number silly~",
+                        "Try: " + command + " <number>");
             } catch (ArrayIndexOutOfBoundsException e) {
-                ui.showError("Hmm something's off with that format~");
-                ui.showError("Check your command and try again!");
+                ui.showErrors("Hmm something's off with that format~",
+                        "Check your command and try again!");
             }
 
             if (!isExit) {

@@ -75,6 +75,17 @@ public class Ui {
     }
 
     /**
+     * Displays one or more error messages to the user.
+     *
+     * @param messages The error messages to display.
+     */
+    public void showErrors(String... messages) {
+        for (String message : messages) {
+            showError(message);
+        }
+    }
+
+    /**
      * Displays a message confirming a task was added.
      *
      * @param task The task that was added.

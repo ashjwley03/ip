@@ -54,12 +54,25 @@ public class CheerLoader {
     }
 
     /**
+     * Adds the given quotes to the list.
+     *
+     * @param newQuotes The quotes to add.
+     */
+    private void addQuotes(String... newQuotes) {
+        for (String quote : newQuotes) {
+            quotes.add(quote);
+        }
+    }
+
+    /**
      * Adds fallback quotes in case the file cannot be loaded.
      */
     private void addFallbackQuotes() {
-        quotes.add("Keep going – even the best programmers started out writing 'Hello World'!");
-        quotes.add("You've got this! Your future self will thank you for not giving up today.");
-        quotes.add("Every expert was once a beginner. Keep coding!");
+        addQuotes(
+                "Keep going – even the best programmers started out writing 'Hello World'!",
+                "You've got this! Your future self will thank you for not giving up today.",
+                "Every expert was once a beginner. Keep coding!"
+        );
     }
 
     /**

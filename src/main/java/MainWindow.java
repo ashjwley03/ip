@@ -49,6 +49,15 @@ public class MainWindow extends AnchorPane {
     }
 
     /**
+     * Adds one or more dialog boxes to the dialog container.
+     *
+     * @param dialogs The dialog boxes to add.
+     */
+    private void addDialogs(DialogBox... dialogs) {
+        dialogContainer.getChildren().addAll(dialogs);
+    }
+
+    /**
      * Creates two dialog boxes, one echoing user input and the other containing
      * Boba's reply, and then appends them to the dialog container.
      * Clears the user input after processing.
@@ -57,7 +66,7 @@ public class MainWindow extends AnchorPane {
     private void handleUserInput() {
         String input = userInput.getText();
         String response = boba.getResponse(input);
-        dialogContainer.getChildren().addAll(
+        addDialogs(
                 DialogBox.getUserDialog(input, userImage),
                 DialogBox.getBobaDialog(response, bobaImage)
         );
