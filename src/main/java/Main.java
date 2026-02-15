@@ -1,3 +1,5 @@
+import boba.Boba;
+
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -22,6 +24,7 @@ public class Main extends Application {
 
     private Image userImage = new Image(this.getClass().getResourceAsStream("/images/User.png"));
     private Image bobaImage = new Image(this.getClass().getResourceAsStream("/images/Boba.png"));
+    private Boba boba = new Boba("./data/boba.txt");
 
     @Override
     public void start(Stage stage) {
@@ -40,10 +43,6 @@ public class Main extends Application {
 
         stage.setScene(scene);
         stage.show();
-
-        // Add a sample dialog box
-        DialogBox dialogBox = new DialogBox("Hello from Boba! 🧋", bobaImage);
-        dialogContainer.getChildren().addAll(dialogBox);
 
         // Formatting the window to look as expected
         stage.setTitle("Boba - Your Bubbly Assistant");
@@ -74,6 +73,36 @@ public class Main extends Application {
         AnchorPane.setLeftAnchor(userInput, 1.0);
         AnchorPane.setBottomAnchor(userInput, 1.0);
 
-        // More code to be added here later
+        // Show welcome message
+        dialogContainer.getChildren().add(
+                DialogBox.getBobaDialog(
+                        "Hii! I'm Boba ◕‿◕\nWhat can I do for you today?",
+                        bobaImage));
+
+        // Handling user input
+        sendButton.setOnMouseClicked((event) -> {
+            handleUserInput();
+        });
+        userInput.setOnAction((event) -> {
+            handleUserInput();
+        });
+
+        // Scroll down to the end every time dialogContainer's height changes
+        dialogContainer.heightProperty().addListener((observable) -> scrollPane.setVvalue(1.0));
+    }
+
+    /**
+     * Creates dialog boxes for user input and Boba's response,
+     * and appends them to the dialog container.
+     * Clears the user input after processing.
+     */
+    private void handleUserInput() {
+        String userText = userInput.getText();
+        String bobaText = boba.getResponse(userInput.getText());
+        dialogContainer.getChildren().addAll(
+                DialogBox.getUserDialog(userText, userImage),
+                DialogBox.getBobaDialog(bobaText, bobaImage)
+        );
+        userInput.clear();
     }
 }

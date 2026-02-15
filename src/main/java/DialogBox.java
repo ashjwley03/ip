@@ -46,9 +46,9 @@ public class DialogBox extends HBox {
     }
 
     /**
-     * Creates a dialog box for user messages.
+     * Creates a dialog box for user messages (image on the right).
      *
-     * @param s The user's message text.
+     * @param s The user's text.
      * @param i The user's avatar image.
      * @return A DialogBox with user styling.
      */
@@ -57,11 +57,11 @@ public class DialogBox extends HBox {
     }
 
     /**
-     * Creates a dialog box for Boba's responses.
+     * Creates a dialog box for Boba's responses (image on the left).
      *
      * @param s Boba's response text.
      * @param i Boba's avatar image.
-     * @return A flipped DialogBox with Boba styling.
+     * @return A DialogBox with Boba styling (flipped).
      */
     public static DialogBox getBobaDialog(String s, Image i) {
         var db = new DialogBox(s, i);
