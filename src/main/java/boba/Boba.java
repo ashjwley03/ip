@@ -11,6 +11,8 @@ import boba.task.Todo;
 import boba.ui.Ui;
 import boba.util.CheerLoader;
 
+import java.util.ArrayList;
+
 /**
  * Main class for the Boba chatbot application.
  * Boba is a personal task manager that helps users track todos, deadlines, and events.
@@ -170,39 +172,29 @@ public class Boba {
         try {
             switch (command) {
             case "bye":
-                response.append("Bye bye :) Hope to see you again soon! ♡");
+                response.append("Bye bye :) Hope to see you again soon! \u2661");
                 break;
 
             case "list":
-                response.append("Okie here's everything on your plate~ 🍡\n");
-                for (int i = 0; i < tasks.size(); i++) {
-                    response.append((i + 1) + "." + tasks.get(i));
-                    if (i < tasks.size() - 1) {
-                        response.append("\n");
-                    }
-                }
+                response.append(formatTaskList());
                 break;
 
             case "mark":
                 int markIndex = Parser.parseIndex(input);
-                if (markIndex < 0 || markIndex >= tasks.size()) {
-                    response.append("Hmm that task doesn't exist!\n");
-                    response.append("You have " + tasks.size()
-                            + " task(s) btw~");
+                if (!isValidIndex(markIndex)) {
+                    response.append(formatInvalidIndexError());
                 } else {
                     tasks.get(markIndex).markAsDone();
                     storage.save(tasks);
-                    response.append("Yay you did it!! ☆ﾟ.*･｡ﾟ\n");
+                    response.append("Yay you did it!! \u2606\uff9f.*\uff65\uff61\uff9f\n");
                     response.append(tasks.get(markIndex));
                 }
                 break;
 
             case "unmark":
                 int unmarkIndex = Parser.parseIndex(input);
-                if (unmarkIndex < 0 || unmarkIndex >= tasks.size()) {
-                    response.append("Hmm that task doesn't exist!\n");
-                    response.append("You have " + tasks.size()
-                            + " task(s) btw~");
+                if (!isValidIndex(unmarkIndex)) {
+                    response.append(formatInvalidIndexError());
                 } else {
                     tasks.get(unmarkIndex).markAsNotDone();
                     storage.save(tasks);
@@ -213,41 +205,21 @@ public class Boba {
                 break;
 
             case "todo":
-                Todo todo = Parser.parseTodo(args);
-                tasks.add(todo);
-                storage.save(tasks);
-                response.append("Got it! I've added this task ✿\n");
-                response.append("  " + todo + "\n");
-                response.append("Now you have " + tasks.size()
-                        + " task(s) in the list~");
+                response.append(addTaskAndRespond(Parser.parseTodo(args)));
                 break;
 
             case "deadline":
-                Deadline deadline = Parser.parseDeadline(args);
-                tasks.add(deadline);
-                storage.save(tasks);
-                response.append("Got it! I've added this task ✿\n");
-                response.append("  " + deadline + "\n");
-                response.append("Now you have " + tasks.size()
-                        + " task(s) in the list~");
+                response.append(addTaskAndRespond(Parser.parseDeadline(args)));
                 break;
 
             case "event":
-                Event event = Parser.parseEvent(args);
-                tasks.add(event);
-                storage.save(tasks);
-                response.append("Got it! I've added this task ✿\n");
-                response.append("  " + event + "\n");
-                response.append("Now you have " + tasks.size()
-                        + " task(s) in the list~");
+                response.append(addTaskAndRespond(Parser.parseEvent(args)));
                 break;
 
             case "delete":
                 int deleteIndex = Parser.parseIndex(input);
-                if (deleteIndex < 0 || deleteIndex >= tasks.size()) {
-                    response.append("Hmm that task doesn't exist!\n");
-                    response.append("You have " + tasks.size()
-                            + " task(s) btw~");
+                if (!isValidIndex(deleteIndex)) {
+                    response.append(formatInvalidIndexError());
                 } else {
                     Task removed = tasks.delete(deleteIndex);
                     storage.save(tasks);
@@ -259,29 +231,12 @@ public class Boba {
                 break;
 
             case "find":
-                if (args.isEmpty()) {
-                    response.append("What should I search for?~\n");
-                    response.append("Try: find <keyword>");
-                } else {
-                    java.util.ArrayList<Task> matches = tasks.find(args);
-                    if (matches.isEmpty()) {
-                        response.append("Hmm no tasks match that keyword~");
-                    } else {
-                        response.append("Here are the matching tasks"
-                                + " in your list~ ✿\n");
-                        for (int i = 0; i < matches.size(); i++) {
-                            response.append((i + 1) + "." + matches.get(i));
-                            if (i < matches.size() - 1) {
-                                response.append("\n");
-                            }
-                        }
-                    }
-                }
+                response.append(findAndRespond(args));
                 break;
 
             case "cheer":
-                response.append("✨ " + cheerLoader.getRandomQuote()
-                        + " ✨");
+                response.append("\u2728 " + cheerLoader.getRandomQuote()
+                        + " \u2728");
                 break;
 
             default:
@@ -301,6 +256,54 @@ public class Boba {
         }
 
         return response.toString();
+    }
+
+    private boolean isValidIndex(int index) {
+        return index >= 0 && index < tasks.size();
+    }
+
+    private String formatInvalidIndexError() {
+        return "Hmm that task doesn't exist!\n"
+                + "You have " + tasks.size() + " task(s) btw~";
+    }
+
+    private String addTaskAndRespond(Task task) {
+        tasks.add(task);
+        storage.save(tasks);
+        return "Got it! I've added this task \u273F\n"
+                + "  " + task + "\n"
+                + "Now you have " + tasks.size() + " task(s) in the list~";
+    }
+
+    private String formatTaskList() {
+        StringBuilder sb = new StringBuilder(
+                "Okie here's everything on your plate~ \uD83C\uDF61\n");
+        for (int i = 0; i < tasks.size(); i++) {
+            sb.append((i + 1) + "." + tasks.get(i));
+            if (i < tasks.size() - 1) {
+                sb.append("\n");
+            }
+        }
+        return sb.toString();
+    }
+
+    private String findAndRespond(String keyword) {
+        if (keyword.isEmpty()) {
+            return "What should I search for?~\nTry: find <keyword>";
+        }
+        ArrayList<Task> matches = tasks.find(keyword);
+        if (matches.isEmpty()) {
+            return "Hmm no tasks match that keyword~";
+        }
+        StringBuilder sb = new StringBuilder(
+                "Here are the matching tasks in your list~ \u273F\n");
+        for (int i = 0; i < matches.size(); i++) {
+            sb.append((i + 1) + "." + matches.get(i));
+            if (i < matches.size() - 1) {
+                sb.append("\n");
+            }
+        }
+        return sb.toString();
     }
 
     /**

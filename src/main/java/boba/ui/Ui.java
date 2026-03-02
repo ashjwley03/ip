@@ -5,6 +5,7 @@ import boba.task.TaskList;
 
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.stream.IntStream;
 
 /**
  * Handles all user interface interactions including displaying messages and reading input.
@@ -136,9 +137,9 @@ public class Ui {
      */
     public void showTaskList(TaskList tasks) {
         System.out.println("    Okie here's everything on your plate~ 🍡");
-        for (int i = 0; i < tasks.size(); i++) {
-            System.out.println("    " + (i + 1) + "." + tasks.get(i));
-        }
+        IntStream.range(0, tasks.size())
+                .forEach(i -> System.out.println(
+                        "    " + (i + 1) + "." + tasks.get(i)));
     }
 
     /**
@@ -158,9 +159,9 @@ public class Ui {
             System.out.println("    Hmm no tasks match that keyword~");
         } else {
             System.out.println("    Here are the matching tasks in your list~ ✿");
-            for (int i = 0; i < matchingTasks.size(); i++) {
-                System.out.println("    " + (i + 1) + "." + matchingTasks.get(i));
-            }
+            IntStream.range(0, matchingTasks.size())
+                    .forEach(i -> System.out.println(
+                            "    " + (i + 1) + "." + matchingTasks.get(i)));
         }
     }
 
