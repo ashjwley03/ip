@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 /**
  * Loads and provides random motivational quotes from a text file.
@@ -37,12 +38,10 @@ public class CheerLoader {
             }
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                if (!line.trim().isEmpty()) {
-                    quotes.add(line.trim());
-                }
-            }
+            quotes = reader.lines()
+                    .map(String::trim)
+                    .filter(line -> !line.isEmpty())
+                    .collect(Collectors.toCollection(ArrayList::new));
             reader.close();
         } catch (IOException e) {
             addFallbackQuotes();

@@ -1,6 +1,7 @@
 package boba.task;
 
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 /**
  * Represents a list of tasks and provides operations to manage them.
@@ -78,12 +79,9 @@ public class TaskList {
      * @return An ArrayList of tasks matching the keyword.
      */
     public ArrayList<Task> find(String keyword) {
-        ArrayList<Task> matchingTasks = new ArrayList<>();
-        for (Task task : tasks) {
-            if (task.toString().toLowerCase().contains(keyword.toLowerCase())) {
-                matchingTasks.add(task);
-            }
-        }
-        return matchingTasks;
+        String lowerKeyword = keyword.toLowerCase();
+        return tasks.stream()
+                .filter(task -> task.toString().toLowerCase().contains(lowerKeyword))
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 }
