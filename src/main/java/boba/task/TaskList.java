@@ -31,6 +31,7 @@ public class TaskList {
      * @param task The task to add.
      */
     public void add(Task task) {
+        assert task != null : "Task to add should not be null";
         tasks.add(task);
     }
 
@@ -41,6 +42,8 @@ public class TaskList {
      * @return The deleted task.
      */
     public Task delete(int index) {
+        assert index >= 0 : "Delete index should not be negative";
+        assert index < tasks.size() : "Delete index should be within bounds";
         return tasks.remove(index);
     }
 
@@ -51,6 +54,8 @@ public class TaskList {
      * @return The task at the specified index.
      */
     public Task get(int index) {
+        assert index >= 0 : "Get index should not be negative";
+        assert index < tasks.size() : "Get index should be within bounds";
         return tasks.get(index);
     }
 
@@ -79,6 +84,7 @@ public class TaskList {
      * @return An ArrayList of tasks matching the keyword.
      */
     public ArrayList<Task> find(String keyword) {
+        assert keyword != null : "Search keyword should not be null";
         String lowerKeyword = keyword.toLowerCase();
         return tasks.stream()
                 .filter(task -> task.toString().toLowerCase().contains(lowerKeyword))
