@@ -17,6 +17,8 @@ public class Parser {
      * @return The first word of the input (the command).
      */
     public static String getCommand(String input) {
+        assert input != null : "Input should not be null";
+        assert !input.trim().isEmpty() : "Input should not be empty";
         return input.split(" ")[0];
     }
 
