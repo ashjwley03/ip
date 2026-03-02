@@ -12,6 +12,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Handles loading and saving tasks to a file.
@@ -117,10 +119,11 @@ public class Storage {
                 parentDir.mkdirs();
             }
 
+            String content = IntStream.range(0, tasks.size())
+                    .mapToObj(i -> taskToString(tasks.get(i)))
+                    .collect(Collectors.joining("\n", "", "\n"));
             FileWriter writer = new FileWriter(file);
-            for (int i = 0; i < tasks.size(); i++) {
-                writer.write(taskToString(tasks.get(i)) + "\n");
-            }
+            writer.write(content);
             writer.close();
         } catch (IOException e) {
             System.out.println("    Oops, couldn't save tasks~");
