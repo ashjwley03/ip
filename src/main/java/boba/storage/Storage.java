@@ -137,15 +137,18 @@ public class Storage {
      * @return The string representation for storage.
      */
     private String taskToString(Task task) {
+        String status = task.isDone() ? "1" : "0";
+        String description = task.getDescription();
+
         if (task instanceof Todo) {
-            return "T | " + (task.isDone() ? "1" : "0") + " | " + task.getDescription();
+            return "T | " + status + " | " + description;
         } else if (task instanceof Deadline) {
             Deadline d = (Deadline) task;
-            return "D | " + (task.isDone() ? "1" : "0") + " | " + task.getDescription()
+            return "D | " + status + " | " + description
                     + " | " + d.getByForStorage();
         } else if (task instanceof Event) {
             Event e = (Event) task;
-            return "E | " + (task.isDone() ? "1" : "0") + " | " + task.getDescription()
+            return "E | " + status + " | " + description
                     + " | " + e.getFrom() + " | " + e.getTo();
         }
         return "";
