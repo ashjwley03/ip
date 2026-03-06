@@ -5,6 +5,7 @@ import boba.task.Deadline;
 import boba.task.DoAfter;
 import boba.task.DoWithin;
 import boba.task.Event;
+import boba.task.FixedDuration;
 import boba.task.Task;
 import boba.task.TentativeEvent;
 import boba.task.Todo;
@@ -228,6 +229,37 @@ public class Parser {
         }
         return applyRecurrence(
                 new DoWithin(description, start, end), rec[1]);
+    }
+
+    /**
+     * Parses arguments to create a FixedDuration task.
+     * Expected format: "description /needs duration"
+     *
+     * @param args The arguments containing description and duration.
+     * @return A new FixedDuration task.
+     * @throws BobException If the format is invalid or fields missing.
+     */
+    public static FixedDuration parseFixedDuration(String args)
+            throws BobException {
+        String[] rec = extractRecurrence(args);
+        String cleaned = rec[0];
+        if (!cleaned.contains(" /needs ")) {
+            throw new BobException(
+                    "How long does this task take?~\n"
+                    + "    Try: fixed <description>"
+                    + " /needs <duration>");
+        }
+        String[] parts = cleaned.split(" /needs ", 2);
+        String description = parts[0].trim();
+        String duration = parts[1].trim();
+        if (description.isEmpty() || duration.isEmpty()) {
+            throw new BobException(
+                    "Hmm something's missing there~\n"
+                    + "    Try: fixed <description>"
+                    + " /needs <duration>");
+        }
+        return applyRecurrence(
+                new FixedDuration(description, duration), rec[1]);
     }
 
     /**

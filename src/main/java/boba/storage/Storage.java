@@ -5,6 +5,7 @@ import boba.task.Deadline;
 import boba.task.DoAfter;
 import boba.task.DoWithin;
 import boba.task.Event;
+import boba.task.FixedDuration;
 import boba.task.Task;
 import boba.task.TaskList;
 import boba.task.TentativeEvent;
@@ -112,6 +113,9 @@ public class Storage {
             case "DW":
                 task = new DoWithin(description, parts[3], parts[4]);
                 break;
+            case "FD":
+                task = new FixedDuration(description, parts[3]);
+                break;
             case "TE":
                 List<String[]> slots = new ArrayList<>();
                 for (int i = 3; i < parts.length; i += 2) {
@@ -189,6 +193,10 @@ public class Storage {
             return "DW | " + status + " | " + description
                     + " | " + dw.getStart() + " | " + dw.getEnd()
                     + recSuffix;
+        } else if (task instanceof FixedDuration) {
+            FixedDuration fd = (FixedDuration) task;
+            return "FD | " + status + " | " + description
+                    + " | " + fd.getDuration() + recSuffix;
         } else if (task instanceof TentativeEvent) {
             TentativeEvent te = (TentativeEvent) task;
             StringBuilder sb = new StringBuilder();
