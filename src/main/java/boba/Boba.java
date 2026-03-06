@@ -284,37 +284,11 @@ public class Boba {
                 break;
 
             case "mark":
-                int markIndex = Parser.parseIndex(input);
-                if (!isValidIndex(markIndex)) {
-                    response.append(formatInvalidIndexError());
-                } else {
-                    tasks.get(markIndex).markAsDone();
-                    response.append(
-                            "Nice, one less pearl to chew on! \uD83E\uDD64\n");
-                    response.append(tasks.get(markIndex));
-                    Task nextTask = createNextIfRecurring(
-                            tasks.get(markIndex));
-                    if (nextTask != null) {
-                        tasks.add(nextTask);
-                        response.append(
-                                "\n\n\uD83D\uDD01 Recurring! Next:\n  "
-                                + nextTask);
-                    }
-                    storage.save(tasks);
-                }
+                response.append(markAndRespond(input));
                 break;
 
             case "unmark":
-                int unmarkIndex = Parser.parseIndex(input);
-                if (!isValidIndex(unmarkIndex)) {
-                    response.append(formatInvalidIndexError());
-                } else {
-                    tasks.get(unmarkIndex).markAsNotDone();
-                    storage.save(tasks);
-                    response.append("No rush~ let it steep a "
-                            + "little longer!\n");
-                    response.append(tasks.get(unmarkIndex));
-                }
+                response.append(unmarkAndRespond(input));
                 break;
 
             case "todo":
@@ -330,18 +304,7 @@ public class Boba {
                 break;
 
             case "delete":
-                int deleteIndex = Parser.parseIndex(input);
-                if (!isValidIndex(deleteIndex)) {
-                    response.append(formatInvalidIndexError());
-                } else {
-                    Task removed = tasks.delete(deleteIndex);
-                    storage.save(tasks);
-                    response.append("Tossed it out like old tea "
-                            + "leaves~\n");
-                    response.append("  " + removed + "\n");
-                    response.append("Now you have " + tasks.size()
-                            + " task(s) in the cup.");
-                }
+                response.append(deleteAndRespond(input));
                 break;
 
             case "find":
@@ -403,11 +366,19 @@ public class Boba {
         } catch (BobaException e) {
             response.append(e.getMessage());
         } catch (NumberFormatException e) {
-            response.append("That's not a number, silly~\n");
-            response.append("Try: " + command + " <number>");
+            response.append("That's not a valid number~\n");
+            response.append("    Format: " + command
+                    + " <task number>\n");
+            response.append("    e.g. " + command + " 1");
         } catch (ArrayIndexOutOfBoundsException e) {
-            response.append("Hmm that recipe doesn't look right~\n");
-            response.append("Check your command and try again!");
+            response.append(
+                    "Hmm that recipe doesn't look right~\n");
+            response.append(
+                    "    Check your command format and"
+                    + " try again!\n");
+            response.append(
+                    "    Type an invalid command to see"
+                    + " the full command list.");
         }
 
         return response.toString();
@@ -492,10 +463,13 @@ public class Boba {
                 lookAheadDays = 14;
             } catch (NumberFormatException e) {
                 return "That's not a valid number of hours~\n"
-                        + "    Try: freetime <hours> or just: freetime";
+                        + "    Format: freetime <hours>\n"
+                        + "    e.g. freetime 3\n"
+                        + "    Or just: freetime (for overview)";
             }
             if (requiredHours < 1 || requiredHours > 14) {
-                return "Hours must be between 1 and 14~";
+                return "Hours must be between 1 and 14~\n"
+                        + "    e.g. freetime 3";
             }
         }
 
@@ -665,16 +639,79 @@ public class Boba {
 
     private String formatInvalidIndexError() {
         return "Hmm can't find that pearl in the cup!\n"
-                + "You have " + tasks.size() + " task(s) btw~";
+                + "You have " + tasks.size() + " task(s).\n"
+                + "    Use a number from 1 to "
+                + tasks.size() + "\n"
+                + "    e.g. mark 1, delete 2, unmark 3";
+    }
+
+    private String markAndRespond(String input) {
+        int idx = Parser.parseIndex(input);
+        if (!isValidIndex(idx)) {
+            return formatInvalidIndexError();
+        }
+        tasks.get(idx).markAsDone();
+        StringBuilder sb = new StringBuilder(
+                "Nice, one less pearl to chew on! \uD83E\uDD64\n");
+        sb.append(tasks.get(idx));
+        Task next = createNextIfRecurring(tasks.get(idx));
+        if (next != null) {
+            tasks.add(next);
+            sb.append("\n\n\uD83D\uDD01 Recurring! Next:\n  "
+                    + next);
+        }
+        storage.save(tasks);
+        return sb.toString();
+    }
+
+    private String unmarkAndRespond(String input) {
+        int idx = Parser.parseIndex(input);
+        if (!isValidIndex(idx)) {
+            return formatInvalidIndexError();
+        }
+        tasks.get(idx).markAsNotDone();
+        storage.save(tasks);
+        return "No rush~ let it steep a little longer!\n"
+                + tasks.get(idx);
+    }
+
+    private String deleteAndRespond(String input) {
+        int idx = Parser.parseIndex(input);
+        if (!isValidIndex(idx)) {
+            return formatInvalidIndexError();
+        }
+        Task removed = tasks.delete(idx);
+        storage.save(tasks);
+        return "Tossed it out like old tea leaves~\n"
+                + "  " + removed + "\n"
+                + "Now you have " + tasks.size()
+                + " task(s) in the cup.";
     }
 
     private String getUnknownCommandMessage() {
-        return "Hmm that's not on the menu~\n"
-                + "Try: todo, deadline, event, doafter,"
-                + " dowithin, fixed, snooze, tentative,"
-                + " confirm, remind, freetime, schedule,"
-                + " list, mark, unmark, delete, find,"
-                + " boba, cheer, or bye!";
+        return "Hmm that's not on the menu~ Here's what I"
+                + " know:\n\n"
+                + "\uD83D\uDCDD Add tasks:\n"
+                + "  todo <desc>\n"
+                + "  deadline <desc> /by <date>\n"
+                + "  event <desc> /from <start> /to <end>\n"
+                + "  doafter <desc> /after <condition>\n"
+                + "  dowithin <desc> /between <start>"
+                + " /and <end>\n"
+                + "  fixed <desc> /needs <duration>\n"
+                + "  tentative <desc> /slot <from>-<to>"
+                + " /slot <from>-<to>\n\n"
+                + "\u2705 Manage tasks:\n"
+                + "  list | mark <#> | unmark <#>"
+                + " | delete <#>\n"
+                + "  find <keyword> | snooze <#> /to"
+                + " <date>\n"
+                + "  confirm <#> /slot <#>\n\n"
+                + "\uD83D\uDCC5 View & plan:\n"
+                + "  schedule [date] | freetime [hours]"
+                + " | remind\n\n"
+                + "\uD83C\uDF1F Fun:\n"
+                + "  boba | cheer | bye";
     }
 
     private String addTaskAndRespond(Task task) {
@@ -798,7 +835,9 @@ public class Boba {
                 ui.showErrors("Hmm can't find that pearl!",
                         "You have " + tasks.size() + " task(s) btw~");
             } else if (!(tasks.get(idx) instanceof Event)) {
-                ui.showError("That's not an event task~");
+                ui.showError("That's not an event task~\n"
+                        + "    For deadlines: snooze <#>"
+                        + " /to <date>");
             } else {
                 Event e = (Event) tasks.get(idx);
                 e.reschedule(parsed[1], parsed[2]);
@@ -814,8 +853,8 @@ public class Boba {
                         "You have " + tasks.size() + " task(s) btw~");
             } else if (!(tasks.get(idx) instanceof Deadline)) {
                 ui.showError("That's not a deadline task~\n"
-                        + "For events: snooze <task#> /from <start>"
-                        + " /to <end>");
+                        + "    For events: snooze <#>"
+                        + " /from <start> /to <end>");
             } else {
                 Deadline d = (Deadline) tasks.get(idx);
                 d.reschedule(parsed[1]);
@@ -836,7 +875,12 @@ public class Boba {
                 return formatInvalidIndexError();
             }
             if (!(tasks.get(idx) instanceof Event)) {
-                return "That's not an event task~";
+                return "That's not an event task~\n"
+                        + "    Snooze only works on events"
+                        + " or deadlines.\n"
+                        + "    For deadlines: snooze <#>"
+                        + " /to <date>\n"
+                        + "    e.g. snooze 1 /to 2026-03-10";
             }
             Event e = (Event) tasks.get(idx);
             e.reschedule(parsed[1], parsed[2]);
@@ -851,8 +895,12 @@ public class Boba {
             }
             if (!(tasks.get(idx) instanceof Deadline)) {
                 return "That's not a deadline task~\n"
-                        + "For events: snooze <task#>"
-                        + " /from <start> /to <end>";
+                        + "    Snooze only works on events"
+                        + " or deadlines.\n"
+                        + "    For events: snooze <#>"
+                        + " /from <start> /to <end>\n"
+                        + "    e.g. snooze 2 /from Mon"
+                        + " /to Wed";
             }
             Deadline d = (Deadline) tasks.get(idx);
             d.reschedule(parsed[1]);
@@ -871,12 +919,22 @@ public class Boba {
             return formatInvalidIndexError();
         }
         if (!(tasks.get(taskIdx) instanceof TentativeEvent)) {
-            return "That's not a tentative event~";
+            return "That's not a tentative event~\n"
+                    + "    Confirm only works on tentative"
+                    + " events.\n"
+                    + "    Format: confirm <task#>"
+                    + " /slot <slot#>\n"
+                    + "    e.g. confirm 3 /slot 1";
         }
         TentativeEvent te = (TentativeEvent) tasks.get(taskIdx);
         if (slotIdx < 0 || slotIdx >= te.getSlotCount()) {
-            return "Invalid slot number!\nThis event has "
-                    + te.getSlotCount() + " slot(s).";
+            return "Invalid slot number!\n"
+                    + "    This event has "
+                    + te.getSlotCount() + " slot(s).\n"
+                    + "    Use a number from 1 to "
+                    + te.getSlotCount() + "\n"
+                    + "    e.g. confirm " + (taskIdx + 1)
+                    + " /slot 1";
         }
         Event confirmed = te.confirm(slotIdx);
         tasks.delete(taskIdx);
@@ -925,7 +983,8 @@ public class Boba {
     private String findAndRespond(String keyword) {
         if (keyword.isEmpty()) {
             return "What flavor are we looking for?~\n"
-                    + "Try: find <keyword>";
+                    + "    Format: find <keyword>\n"
+                    + "    e.g. find homework";
         }
         ArrayList<Task> matches = tasks.find(keyword);
         if (matches.isEmpty()) {

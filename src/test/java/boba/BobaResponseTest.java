@@ -66,7 +66,8 @@ public class BobaResponseTest {
     public void getResponse_unknownCommand_showsError() {
         String response = boba.getResponse("dance");
         assertTrue(response.contains("not on the menu"));
-        assertTrue(response.contains("Try:"));
+        assertTrue(response.contains("todo"));
+        assertTrue(response.contains("deadline"));
     }
 
     @Test

@@ -61,7 +61,10 @@ public class MainWindow extends AnchorPane {
         return response.startsWith("Hmm")
                 || response.startsWith("Invalid")
                 || response.startsWith("That's not")
-                || response.startsWith("What flavor");
+                || response.startsWith("What flavor")
+                || response.startsWith("Uhh")
+                || response.startsWith("Type something")
+                || response.contains("not a valid");
     }
 
     @FXML

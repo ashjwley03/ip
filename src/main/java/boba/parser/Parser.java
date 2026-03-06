@@ -103,7 +103,8 @@ public class Parser {
         if (!VALID_FREQUENCIES.contains(freq)) {
             throw new BobaException(
                     "Invalid frequency '" + freq + "'~\n"
-                    + "    Use: daily, weekly, or monthly");
+                    + "    Use: daily, weekly, or monthly\n"
+                    + "    e.g. todo standup /every weekly");
         }
         return new String[]{before, freq};
     }
@@ -183,7 +184,8 @@ public class Parser {
         if (clean.isEmpty()) {
             throw new BobaException(
                     "Uhh what's the task? Can't be empty~\n"
-                    + "    Try: todo <description>");
+                    + "    Format: todo <description>\n"
+                    + "    e.g. todo buy boba tea");
         }
         String[] rec = extractRecurrence(clean);
         return applyRecurrence(new Todo(rec[0]), rec[1]);
@@ -202,16 +204,26 @@ public class Parser {
         String[] rec = extractRecurrence(clean);
         String cleaned = rec[0];
         if (!cleaned.contains(" /by ")) {
-            throw new BobaException("When's it due? Add /by <date>~\n"
-                    + "    Try: deadline <description> /by <when>");
+            String hint = "";
+            if (cleaned.contains(" by ")) {
+                hint = "    Hint: use /by (with a slash),"
+                        + " not just 'by'\n";
+            }
+            throw new BobaException(
+                    "When's it due? I need /by~\n" + hint
+                    + "    Format: deadline <desc> /by <when>\n"
+                    + "    e.g. deadline homework /by 2026-03-10\n"
+                    + "    e.g. deadline essay /by Friday");
         }
         rejectDuplicateFlag(cleaned, " /by ");
         String[] parts = cleaned.split(" /by ", 2);
         String description = parts[0].trim();
         String by = parts[1].trim();
         if (description.isEmpty() || by.isEmpty()) {
-            throw new BobaException("Hmm something's missing there~\n"
-                    + "    Try: deadline <description> /by <when>");
+            throw new BobaException(
+                    "Hmm something's missing~\n"
+                    + "    Format: deadline <desc> /by <when>\n"
+                    + "    e.g. deadline homework /by 2026-03-10");
         }
         validateDate(by, "/by");
         return applyRecurrence(new Deadline(description, by), rec[1]);
@@ -230,9 +242,19 @@ public class Parser {
         String[] rec = extractRecurrence(clean);
         String cleaned = rec[0];
         if (!cleaned.contains(" /from ") || !cleaned.contains(" /to ")) {
-            throw new BobaException("I need both /from and /to times~\n"
-                    + "    Try: event <description> /from <start>"
-                    + " /to <end>");
+            String hint = "";
+            if (cleaned.contains(" from ") || cleaned.contains(" to ")) {
+                hint = "    Hint: use /from and /to"
+                        + " (with slashes)\n";
+            }
+            throw new BobaException(
+                    "I need both /from and /to~\n" + hint
+                    + "    Format: event <desc> /from <start>"
+                    + " /to <end>\n"
+                    + "    e.g. event meeting /from Mon 2pm"
+                    + " /to 4pm\n"
+                    + "    e.g. event party /from 2026-03-10"
+                    + " /to 2026-03-11");
         }
         rejectDuplicateFlag(cleaned, " /from ");
         rejectDuplicateFlag(cleaned, " /to ");
@@ -242,9 +264,12 @@ public class Parser {
         String from = timeParts[0].trim();
         String to = timeParts[1].trim();
         if (description.isEmpty() || from.isEmpty() || to.isEmpty()) {
-            throw new BobaException("Hmm something's missing there~\n"
-                    + "    Try: event <description> /from <start>"
-                    + " /to <end>");
+            throw new BobaException(
+                    "Hmm something's missing~\n"
+                    + "    Format: event <desc> /from <start>"
+                    + " /to <end>\n"
+                    + "    e.g. event meeting /from Mon 2pm"
+                    + " /to 4pm");
         }
         validateDate(from, "/from");
         validateDate(to, "/to");
@@ -267,17 +292,21 @@ public class Parser {
         if (!cleaned.contains(" /after ")) {
             throw new BobaException(
                     "What should this be done after?~\n"
-                    + "    Try: doafter <description>"
-                    + " /after <time or task>");
+                    + "    Format: doafter <desc>"
+                    + " /after <condition>\n"
+                    + "    e.g. doafter return book"
+                    + " /after exam");
         }
         String[] parts = cleaned.split(" /after ", 2);
         String description = parts[0].trim();
         String after = parts[1].trim();
         if (description.isEmpty() || after.isEmpty()) {
             throw new BobaException(
-                    "Hmm something's missing there~\n"
-                    + "    Try: doafter <description>"
-                    + " /after <time or task>");
+                    "Hmm something's missing~\n"
+                    + "    Format: doafter <desc>"
+                    + " /after <condition>\n"
+                    + "    e.g. doafter return book"
+                    + " /after exam");
         }
         return applyRecurrence(
                 new DoAfter(description, after), rec[1]);
@@ -296,11 +325,14 @@ public class Parser {
         String clean = sanitize(args);
         String[] rec = extractRecurrence(clean);
         String cleaned = rec[0];
-        if (!cleaned.contains(" /between ") || !cleaned.contains(" /and ")) {
+        if (!cleaned.contains(" /between ")
+                || !cleaned.contains(" /and ")) {
             throw new BobaException(
                     "I need both /between and /and~\n"
-                    + "    Try: dowithin <description>"
-                    + " /between <start> /and <end>");
+                    + "    Format: dowithin <desc>"
+                    + " /between <start> /and <end>\n"
+                    + "    e.g. dowithin collect cert"
+                    + " /between Jan 15 /and Jan 25");
         }
         rejectDuplicateFlag(cleaned, " /between ");
         rejectDuplicateFlag(cleaned, " /and ");
@@ -312,9 +344,11 @@ public class Parser {
         if (description.isEmpty() || start.isEmpty()
                 || end.isEmpty()) {
             throw new BobaException(
-                    "Hmm something's missing there~\n"
-                    + "    Try: dowithin <description>"
-                    + " /between <start> /and <end>");
+                    "Hmm something's missing~\n"
+                    + "    Format: dowithin <desc>"
+                    + " /between <start> /and <end>\n"
+                    + "    e.g. dowithin collect cert"
+                    + " /between Jan 15 /and Jan 25");
         }
         validateDate(start, "/between");
         validateDate(end, "/and");
@@ -339,17 +373,21 @@ public class Parser {
         if (!cleaned.contains(" /needs ")) {
             throw new BobaException(
                     "How long does this task take?~\n"
-                    + "    Try: fixed <description>"
-                    + " /needs <duration>");
+                    + "    Format: fixed <desc>"
+                    + " /needs <duration>\n"
+                    + "    e.g. fixed read report"
+                    + " /needs 2 hours");
         }
         String[] parts = cleaned.split(" /needs ", 2);
         String description = parts[0].trim();
         String duration = parts[1].trim();
         if (description.isEmpty() || duration.isEmpty()) {
             throw new BobaException(
-                    "Hmm something's missing there~\n"
-                    + "    Try: fixed <description>"
-                    + " /needs <duration>");
+                    "Hmm something's missing~\n"
+                    + "    Format: fixed <desc>"
+                    + " /needs <duration>\n"
+                    + "    e.g. fixed read report"
+                    + " /needs 2 hours");
         }
         return applyRecurrence(
                 new FixedDuration(description, duration), rec[1]);
@@ -367,17 +405,32 @@ public class Parser {
             throws BobaException {
         String clean = sanitize(args);
         if (!clean.contains(" /to ")) {
+            String hint = "";
+            if (clean.contains(" to ")) {
+                hint = "    Hint: use /to (with a slash), "
+                        + "not just 'to'\n";
+            }
+            if (!clean.isEmpty()
+                    && !Character.isDigit(clean.charAt(0))) {
+                hint += "    Hint: use the task number, "
+                        + "not its name\n";
+            }
             throw new BobaException(
                     "When should I reschedule it to?~\n"
-                    + "    Deadline: snooze <task#> /to <new date>\n"
+                    + hint
+                    + "    Deadline: snooze <task#> /to"
+                    + " <new date>\n"
                     + "    Event: snooze <task#> /from <start>"
-                    + " /to <end>");
+                    + " /to <end>\n"
+                    + "    e.g. snooze 1 /to 2026-03-10");
         }
         String[] parts = clean.split(" /to ", 2);
         String indexStr = parts[0].trim();
         String newDate = parts[1].trim();
         if (newDate.isEmpty()) {
-            throw new BobaException("The new date can't be empty~");
+            throw new BobaException(
+                    "The new date can't be empty~\n"
+                    + "    e.g. snooze 1 /to 2026-03-10");
         }
         validateDate(newDate, "/to");
         try {
@@ -388,8 +441,11 @@ public class Parser {
             }
             return new String[]{String.valueOf(index), newDate};
         } catch (NumberFormatException e) {
-            throw new BobaException("That's not a valid task number~\n"
-                    + "    Try: snooze <task#> /to <new date>");
+            throw new BobaException(
+                    "That's not a valid task number~\n"
+                    + "    Format: snooze <task#>"
+                    + " /to <new date>\n"
+                    + "    e.g. snooze 1 /to 2026-03-10");
         }
     }
 
@@ -407,8 +463,10 @@ public class Parser {
         if (!clean.contains(" /from ") || !clean.contains(" /to ")) {
             throw new BobaException(
                     "Both /from and /to are needed~\n"
-                    + "    Try: snooze <task#> /from <start>"
-                    + " /to <end>");
+                    + "    Format: snooze <task#>"
+                    + " /from <start> /to <end>\n"
+                    + "    e.g. snooze 2 /from 2026-03-10"
+                    + " /to 2026-03-11");
         }
         String[] parts = clean.split(" /from ", 2);
         String indexStr = parts[0].trim();
@@ -417,9 +475,11 @@ public class Parser {
         String newTo = timeParts[1].trim();
         if (newFrom.isEmpty() || newTo.isEmpty()) {
             throw new BobaException(
-                    "Both /from and /to are needed~\n"
-                    + "    Try: snooze <task#> /from <start>"
-                    + " /to <end>");
+                    "Hmm something's missing~\n"
+                    + "    Format: snooze <task#>"
+                    + " /from <start> /to <end>\n"
+                    + "    e.g. snooze 2 /from 2026-03-10"
+                    + " /to 2026-03-11");
         }
         validateDate(newFrom, "/from");
         validateDate(newTo, "/to");
@@ -432,9 +492,12 @@ public class Parser {
             }
             return new String[]{String.valueOf(index), newFrom, newTo};
         } catch (NumberFormatException e) {
-            throw new BobaException("That's not a valid task number~\n"
-                    + "    Try: snooze <task#> /from <start>"
-                    + " /to <end>");
+            throw new BobaException(
+                    "That's not a valid task number~\n"
+                    + "    Format: snooze <task#>"
+                    + " /from <start> /to <end>\n"
+                    + "    e.g. snooze 2 /from Mon 2pm"
+                    + " /to 4pm");
         }
     }
 
@@ -449,15 +512,25 @@ public class Parser {
     public static TentativeEvent parseTentative(String args) throws BobaException {
         String clean = sanitize(args);
         if (!clean.contains(" /slot ")) {
-            throw new BobaException("I need time slots for tentative events~\n"
-                    + "    Try: tentative <description> /slot <from> - <to>"
-                    + " /slot <from> - <to>");
+            throw new BobaException(
+                    "I need time slots for tentative events~\n"
+                    + "    Format: tentative <desc>"
+                    + " /slot <from> - <to>"
+                    + " /slot <from> - <to>\n"
+                    + "    e.g. tentative team meeting"
+                    + " /slot Mon 2pm - 4pm"
+                    + " /slot Tue 3pm - 5pm");
         }
         String[] parts = clean.split(" /slot ");
         String description = parts[0].trim();
         if (description.isEmpty()) {
-            throw new BobaException("What's the event called?~\n"
-                    + "    Try: tentative <description> /slot ...");
+            throw new BobaException(
+                    "What's the event called?~\n"
+                    + "    Format: tentative <desc>"
+                    + " /slot <from> - <to> ...\n"
+                    + "    e.g. tentative team meeting"
+                    + " /slot Mon 2pm - 4pm"
+                    + " /slot Tue 3pm - 5pm");
         }
 
         List<String[]> slots = new ArrayList<>();
@@ -479,9 +552,13 @@ public class Parser {
         }
 
         if (slots.size() < 2) {
-            throw new BobaException("Need at least 2 time slots for"
+            throw new BobaException(
+                    "Need at least 2 time slots for"
                     + " tentative scheduling~\n"
-                    + "    Try adding more /slot entries!");
+                    + "    Add more /slot entries!\n"
+                    + "    e.g. tentative meeting"
+                    + " /slot Mon 2pm - 4pm"
+                    + " /slot Tue 3pm - 5pm");
         }
         return new TentativeEvent(description, slots);
     }
@@ -497,8 +574,11 @@ public class Parser {
     public static int[] parseConfirm(String args) throws BobaException {
         String clean = sanitize(args);
         if (!clean.contains(" /slot ")) {
-            throw new BobaException("Which slot to confirm?~\n"
-                    + "    Try: confirm <task#> /slot <slot#>");
+            throw new BobaException(
+                    "Which slot to confirm?~\n"
+                    + "    Format: confirm <task#>"
+                    + " /slot <slot#>\n"
+                    + "    e.g. confirm 3 /slot 1");
         }
         String[] parts = clean.split(" /slot ");
         try {
@@ -506,8 +586,11 @@ public class Parser {
             int slotIndex = Integer.parseInt(parts[1].trim()) - 1;
             return new int[]{taskIndex, slotIndex};
         } catch (NumberFormatException e) {
-            throw new BobaException("Those don't look like numbers~\n"
-                    + "    Try: confirm <task#> /slot <slot#>");
+            throw new BobaException(
+                    "Those don't look like numbers~\n"
+                    + "    Format: confirm <task#>"
+                    + " /slot <slot#>\n"
+                    + "    e.g. confirm 3 /slot 1");
         }
     }
 }
