@@ -2,6 +2,7 @@ package boba.parser;
 
 import boba.exception.BobException;
 import boba.task.Deadline;
+import boba.task.DoAfter;
 import boba.task.Event;
 import boba.task.Task;
 import boba.task.TentativeEvent;
@@ -162,6 +163,36 @@ public class Parser {
                     + " /to <end>");
         }
         return applyRecurrence(new Event(description, from, to), rec[1]);
+    }
+
+    /**
+     * Parses arguments to create a DoAfter task.
+     * Expected format: "description /after condition"
+     *
+     * @param args The arguments containing description and condition.
+     * @return A new DoAfter task.
+     * @throws BobException If the format is invalid or fields are missing.
+     */
+    public static DoAfter parseDoAfter(String args) throws BobException {
+        String[] rec = extractRecurrence(args);
+        String cleaned = rec[0];
+        if (!cleaned.contains(" /after ")) {
+            throw new BobException(
+                    "What should this be done after?~\n"
+                    + "    Try: doafter <description>"
+                    + " /after <time or task>");
+        }
+        String[] parts = cleaned.split(" /after ", 2);
+        String description = parts[0].trim();
+        String after = parts[1].trim();
+        if (description.isEmpty() || after.isEmpty()) {
+            throw new BobException(
+                    "Hmm something's missing there~\n"
+                    + "    Try: doafter <description>"
+                    + " /after <time or task>");
+        }
+        return applyRecurrence(
+                new DoAfter(description, after), rec[1]);
     }
 
     /**
