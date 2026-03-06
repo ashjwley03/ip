@@ -1,6 +1,6 @@
 package boba.storage;
 
-import boba.exception.BobException;
+import boba.exception.BobaException;
 import boba.task.Deadline;
 import boba.task.DoAfter;
 import boba.task.DoWithin;
@@ -42,16 +42,16 @@ public class Storage {
      * Creates the directory and file if they don't exist.
      *
      * @return An ArrayList of tasks loaded from the file.
-     * @throws BobException If there's an error reading the file.
+     * @throws BobaException If there's an error reading the file.
      */
-    public ArrayList<Task> load() throws BobException {
+    public ArrayList<Task> load() throws BobaException {
         ArrayList<Task> tasks = new ArrayList<>();
         File file = new File(filePath);
 
         File parentDir = file.getParentFile();
         if (parentDir != null && !parentDir.exists()) {
             if (!parentDir.mkdirs()) {
-                throw new BobException(
+                throw new BobaException(
                         "Couldn't create data directory: "
                         + parentDir.getAbsolutePath());
             }
@@ -62,7 +62,7 @@ public class Storage {
         }
 
         if (!file.canRead()) {
-            throw new BobException(
+            throw new BobaException(
                     "Can't read save file (permission denied): "
                     + file.getAbsolutePath());
         }
@@ -86,7 +86,7 @@ public class Storage {
             }
             scanner.close();
         } catch (IOException e) {
-            throw new BobException(
+            throw new BobaException(
                     "Hmm couldn't load saved tasks~\n"
                     + "    Error: " + e.getMessage());
         }

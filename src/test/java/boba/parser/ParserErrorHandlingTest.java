@@ -1,6 +1,6 @@
 package boba.parser;
 
-import boba.exception.BobException;
+import boba.exception.BobaException;
 
 import org.junit.jupiter.api.Test;
 
@@ -41,28 +41,28 @@ public class ParserErrorHandlingTest {
     }
 
     @Test
-    public void parseTodo_pipeCharacter_throwsBobException() {
-        BobException ex = assertThrows(BobException.class,
+    public void parseTodo_pipeCharacter_throwsBobaException() {
+        BobaException ex = assertThrows(BobaException.class,
                 () -> Parser.parseTodo("buy | sell"));
         assertTrue(ex.getMessage().contains("|"));
     }
 
     @Test
-    public void parseTodo_whitespaceOnly_throwsBobException() {
-        assertThrows(BobException.class,
+    public void parseTodo_whitespaceOnly_throwsBobaException() {
+        assertThrows(BobaException.class,
                 () -> Parser.parseTodo("   "));
     }
 
     @Test
-    public void parseDeadline_invalidDate_throwsBobException() {
-        BobException ex = assertThrows(BobException.class,
+    public void parseDeadline_invalidDate_throwsBobaException() {
+        BobaException ex = assertThrows(BobaException.class,
                 () -> Parser.parseDeadline("hw /by 2024-02-30"));
         assertTrue(ex.getMessage().contains("not a valid date"));
     }
 
     @Test
-    public void parseDeadline_duplicateBy_throwsBobException() {
-        BobException ex = assertThrows(BobException.class,
+    public void parseDeadline_duplicateBy_throwsBobaException() {
+        BobaException ex = assertThrows(BobaException.class,
                 () -> Parser.parseDeadline(
                         "hw /by mon /by tue"));
         assertTrue(ex.getMessage().contains("more than once"));
@@ -75,24 +75,24 @@ public class ParserErrorHandlingTest {
     }
 
     @Test
-    public void parseEvent_startAfterEnd_throwsBobException() {
-        BobException ex = assertThrows(BobException.class,
+    public void parseEvent_startAfterEnd_throwsBobaException() {
+        BobaException ex = assertThrows(BobaException.class,
                 () -> Parser.parseEvent(
                         "party /from 2024-12-25 /to 2024-12-20"));
         assertTrue(ex.getMessage().contains("after"));
     }
 
     @Test
-    public void parseEvent_invalidFromDate_throwsBobException() {
-        BobException ex = assertThrows(BobException.class,
+    public void parseEvent_invalidFromDate_throwsBobaException() {
+        BobaException ex = assertThrows(BobaException.class,
                 () -> Parser.parseEvent(
                         "party /from 2024-13-01 /to 2024-12-25"));
         assertTrue(ex.getMessage().contains("not a valid date"));
     }
 
     @Test
-    public void parseEvent_duplicateFrom_throwsBobException() {
-        BobException ex = assertThrows(BobException.class,
+    public void parseEvent_duplicateFrom_throwsBobaException() {
+        BobaException ex = assertThrows(BobaException.class,
                 () -> Parser.parseEvent(
                         "meet /from 2pm /from 3pm /to 5pm"));
         assertTrue(ex.getMessage().contains("more than once"));
@@ -106,8 +106,8 @@ public class ParserErrorHandlingTest {
     }
 
     @Test
-    public void parseDoWithin_endBeforeStart_throwsBobException() {
-        BobException ex = assertThrows(BobException.class,
+    public void parseDoWithin_endBeforeStart_throwsBobaException() {
+        BobaException ex = assertThrows(BobaException.class,
                 () -> Parser.parseDoWithin(
                         "cert /between 2024-12-25"
                         + " /and 2024-12-01"));
@@ -115,37 +115,37 @@ public class ParserErrorHandlingTest {
     }
 
     @Test
-    public void parseSnoozeDeadline_invalidDate_throwsBobException() {
-        BobException ex = assertThrows(BobException.class,
+    public void parseSnoozeDeadline_invalidDate_throwsBobaException() {
+        BobaException ex = assertThrows(BobaException.class,
                 () -> Parser.parseSnoozeDeadline(
                         "1 /to 2024-02-30"));
         assertTrue(ex.getMessage().contains("not a valid date"));
     }
 
     @Test
-    public void parseSnoozeDeadline_nonNumericIndex_throwsBobException() {
-        BobException ex = assertThrows(BobException.class,
+    public void parseSnoozeDeadline_nonNumericIndex_throwsBobaException() {
+        BobaException ex = assertThrows(BobaException.class,
                 () -> Parser.parseSnoozeDeadline("abc /to 2024-12-25"));
         assertTrue(ex.getMessage().contains("not a valid task number"));
     }
 
     @Test
-    public void parseConfirm_missingSlot_throwsBobException() {
-        assertThrows(BobException.class,
+    public void parseConfirm_missingSlot_throwsBobaException() {
+        assertThrows(BobaException.class,
                 () -> Parser.parseConfirm("1"));
     }
 
     @Test
-    public void parseTentative_onlyOneSlot_throwsBobException() {
-        BobException ex = assertThrows(BobException.class,
+    public void parseTentative_onlyOneSlot_throwsBobaException() {
+        BobaException ex = assertThrows(BobaException.class,
                 () -> Parser.parseTentative(
                         "meeting /slot 2pm - 4pm"));
         assertTrue(ex.getMessage().contains("at least 2"));
     }
 
     @Test
-    public void parseFixedDuration_missingNeeds_throwsBobException() {
-        assertThrows(BobException.class,
+    public void parseFixedDuration_missingNeeds_throwsBobaException() {
+        assertThrows(BobaException.class,
                 () -> Parser.parseFixedDuration("read report"));
     }
 }

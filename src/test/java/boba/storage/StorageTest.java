@@ -1,6 +1,6 @@
 package boba.storage;
 
-import boba.exception.BobException;
+import boba.exception.BobaException;
 import boba.task.Deadline;
 import boba.task.Event;
 import boba.task.Task;
@@ -30,7 +30,7 @@ public class StorageTest {
 
     @Test
     public void load_nonExistentFile_returnsEmptyList()
-            throws BobException {
+            throws BobaException {
         Storage storage = new Storage(getPath("none.txt"));
         ArrayList<Task> tasks = storage.load();
         assertTrue(tasks.isEmpty());
@@ -38,7 +38,7 @@ public class StorageTest {
 
     @Test
     public void saveAndLoad_roundTrip_preservesTasks()
-            throws BobException {
+            throws BobaException {
         String path = getPath("roundtrip.txt");
         Storage storage = new Storage(path);
 
@@ -57,7 +57,7 @@ public class StorageTest {
 
     @Test
     public void load_corruptedLines_skipsGracefully()
-            throws BobException, IOException {
+            throws BobaException, IOException {
         String path = getPath("corrupt.txt");
         FileWriter writer = new FileWriter(path);
         writer.write("T | 0 | valid task\n");
@@ -76,7 +76,7 @@ public class StorageTest {
 
     @Test
     public void load_emptyFile_returnsEmptyList()
-            throws BobException, IOException {
+            throws BobaException, IOException {
         String path = getPath("empty.txt");
         new FileWriter(path).close();
 
@@ -87,7 +87,7 @@ public class StorageTest {
 
     @Test
     public void saveAndLoad_markedDone_preservesStatus()
-            throws BobException {
+            throws BobaException {
         String path = getPath("done.txt");
         Storage storage = new Storage(path);
 
@@ -104,7 +104,7 @@ public class StorageTest {
 
     @Test
     public void saveAndLoad_recurringTask_preservesRecurrence()
-            throws BobException {
+            throws BobaException {
         String path = getPath("recur.txt");
         Storage storage = new Storage(path);
 

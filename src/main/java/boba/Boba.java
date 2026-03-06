@@ -1,6 +1,6 @@
 package boba;
 
-import boba.exception.BobException;
+import boba.exception.BobaException;
 import boba.parser.Parser;
 import boba.storage.Storage;
 import boba.task.Deadline;
@@ -42,7 +42,7 @@ public class Boba {
         cheerLoader = new CheerLoader();
         try {
             tasks = new TaskList(storage.load());
-        } catch (BobException e) {
+        } catch (BobaException e) {
             ui.showLoadingError();
             tasks = new TaskList();
         }
@@ -71,7 +71,7 @@ public class Boba {
                 } else {
                     processCommandCli(command, args, input);
                 }
-            } catch (BobException e) {
+            } catch (BobaException e) {
                 ui.showError(e.getMessage());
             } catch (NumberFormatException e) {
                 ui.showErrors("That's not a number, silly~",
@@ -98,7 +98,7 @@ public class Boba {
     }
 
     private void processCommandCli(String command, String args, String input)
-            throws BobException {
+            throws BobaException {
         switch (command) {
         case "list":
             ui.showTaskList(tasks);
@@ -232,7 +232,7 @@ public class Boba {
         }
     }
 
-    private void handleConfirmRun(String args) throws BobException {
+    private void handleConfirmRun(String args) throws BobaException {
         int[] confirmArgs = Parser.parseConfirm(args);
         int taskIdx = confirmArgs[0];
         int slotIdx = confirmArgs[1];
@@ -400,7 +400,7 @@ public class Boba {
                 response.append(getUnknownCommandMessage());
                 break;
             }
-        } catch (BobException e) {
+        } catch (BobaException e) {
             response.append(e.getMessage());
         } catch (NumberFormatException e) {
             response.append("That's not a number, silly~\n");
@@ -789,7 +789,7 @@ public class Boba {
         return sb.toString();
     }
 
-    private void handleSnoozeRun(String args) throws BobException {
+    private void handleSnoozeRun(String args) throws BobaException {
         boolean isEventSnooze = args.contains(" /from ");
         if (isEventSnooze) {
             String[] parsed = Parser.parseSnoozeEvent(args);
@@ -826,7 +826,7 @@ public class Boba {
         }
     }
 
-    private String snoozeAndRespond(String args) throws BobException {
+    private String snoozeAndRespond(String args) throws BobaException {
         boolean isEventSnooze = args.contains(" /from ");
 
         if (isEventSnooze) {
@@ -862,7 +862,7 @@ public class Boba {
         }
     }
 
-    private String confirmSlotAndRespond(String args) throws BobException {
+    private String confirmSlotAndRespond(String args) throws BobaException {
         int[] confirmArgs = Parser.parseConfirm(args);
         int taskIdx = confirmArgs[0];
         int slotIdx = confirmArgs[1];

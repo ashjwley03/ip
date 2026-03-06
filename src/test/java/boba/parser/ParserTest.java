@@ -1,6 +1,6 @@
 package boba.parser;
 
-import boba.exception.BobException;
+import boba.exception.BobaException;
 import boba.task.Deadline;
 import boba.task.Event;
 import boba.task.Todo;
@@ -61,19 +61,19 @@ public class ParserTest {
     }
 
     @Test
-    public void parseTodo_validDescription_returnsTodo() throws BobException {
+    public void parseTodo_validDescription_returnsTodo() throws BobaException {
         Todo todo = Parser.parseTodo("buy boba");
         assertEquals("[T][ ] buy boba", todo.toString());
     }
 
     @Test
-    public void parseTodo_emptyDescription_throwsBobException() {
-        BobException exception = assertThrows(BobException.class, () -> Parser.parseTodo(""));
+    public void parseTodo_emptyDescription_throwsBobaException() {
+        BobaException exception = assertThrows(BobaException.class, () -> Parser.parseTodo(""));
         assertTrue(exception.getMessage().contains("empty"));
     }
 
     @Test
-    public void parseDeadline_validInput_returnsDeadline() throws BobException {
+    public void parseDeadline_validInput_returnsDeadline() throws BobaException {
         Deadline deadline = Parser.parseDeadline("homework /by tomorrow");
         assertTrue(deadline.toString().contains("[D]"));
         assertTrue(deadline.toString().contains("homework"));
@@ -81,19 +81,19 @@ public class ParserTest {
     }
 
     @Test
-    public void parseDeadline_missingBy_throwsBobException() {
-        BobException exception = assertThrows(BobException.class, 
+    public void parseDeadline_missingBy_throwsBobaException() {
+        BobaException exception = assertThrows(BobaException.class, 
             () -> Parser.parseDeadline("homework tomorrow"));
         assertTrue(exception.getMessage().contains("/by"));
     }
 
     @Test
-    public void parseDeadline_emptyDescription_throwsBobException() {
-        assertThrows(BobException.class, () -> Parser.parseDeadline(" /by tomorrow"));
+    public void parseDeadline_emptyDescription_throwsBobaException() {
+        assertThrows(BobaException.class, () -> Parser.parseDeadline(" /by tomorrow"));
     }
 
     @Test
-    public void parseEvent_validInput_returnsEvent() throws BobException {
+    public void parseEvent_validInput_returnsEvent() throws BobaException {
         Event event = Parser.parseEvent("meeting /from 2pm /to 4pm");
         assertTrue(event.toString().contains("[E]"));
         assertTrue(event.toString().contains("meeting"));
@@ -102,12 +102,12 @@ public class ParserTest {
     }
 
     @Test
-    public void parseEvent_missingFrom_throwsBobException() {
-        assertThrows(BobException.class, () -> Parser.parseEvent("meeting /to 4pm"));
+    public void parseEvent_missingFrom_throwsBobaException() {
+        assertThrows(BobaException.class, () -> Parser.parseEvent("meeting /to 4pm"));
     }
 
     @Test
-    public void parseEvent_missingTo_throwsBobException() {
-        assertThrows(BobException.class, () -> Parser.parseEvent("meeting /from 2pm"));
+    public void parseEvent_missingTo_throwsBobaException() {
+        assertThrows(BobaException.class, () -> Parser.parseEvent("meeting /from 2pm"));
     }
 }

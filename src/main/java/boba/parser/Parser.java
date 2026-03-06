@@ -1,6 +1,6 @@
 package boba.parser;
 
-import boba.exception.BobException;
+import boba.exception.BobaException;
 import boba.task.Deadline;
 import boba.task.DoAfter;
 import boba.task.DoWithin;
@@ -27,10 +27,10 @@ public class Parser {
     /**
      * Normalizes whitespace and validates basic input safety.
      */
-    private static String sanitize(String args) throws BobException {
+    private static String sanitize(String args) throws BobaException {
         String normalized = args.replaceAll("\\s+", " ").trim();
         if (normalized.contains("|")) {
-            throw new BobException(
+            throw new BobaException(
                     "The '|' character is reserved~\n"
                     + "    Please remove it from your input.");
         }
@@ -42,14 +42,14 @@ public class Parser {
      * Only checks strings that look like yyyy-mm-dd format.
      */
     private static void validateDate(String dateStr, String label)
-            throws BobException {
+            throws BobaException {
         if (!dateStr.matches("\\d{4}-\\d{2}-\\d{2}")) {
             return;
         }
         try {
             LocalDate.parse(dateStr);
         } catch (DateTimeParseException e) {
-            throw new BobException("'" + dateStr
+            throw new BobaException("'" + dateStr
                     + "' is not a valid date for " + label + "~\n"
                     + "    Check the month/day values.");
         }
@@ -62,7 +62,7 @@ public class Parser {
     private static void validateDateOrder(
             String fromStr, String toStr,
             String fromLabel, String toLabel)
-            throws BobException {
+            throws BobaException {
         if (!fromStr.matches("\\d{4}-\\d{2}-\\d{2}")
                 || !toStr.matches("\\d{4}-\\d{2}-\\d{2}")) {
             return;
@@ -70,17 +70,17 @@ public class Parser {
         LocalDate from = LocalDate.parse(fromStr);
         LocalDate to = LocalDate.parse(toStr);
         if (from.isAfter(to)) {
-            throw new BobException(fromLabel + " (" + fromStr
+            throw new BobaException(fromLabel + " (" + fromStr
                     + ") is after " + toLabel + " (" + toStr
                     + ")~\n    That doesn't seem right!");
         }
     }
 
     private static void rejectDuplicateFlag(
-            String args, String flag) throws BobException {
+            String args, String flag) throws BobaException {
         int first = args.indexOf(flag);
         if (first >= 0 && args.indexOf(flag, first + 1) >= 0) {
-            throw new BobException(
+            throw new BobaException(
                     "'" + flag.trim() + "' appears more than "
                     + "once~\n    Each flag should only be "
                     + "used once.");
@@ -93,7 +93,7 @@ public class Parser {
      * If no /every is found, frequency is null.
      */
     private static String[] extractRecurrence(String args)
-            throws BobException {
+            throws BobaException {
         if (!args.contains(" /every ")) {
             return new String[]{args, null};
         }
@@ -101,7 +101,7 @@ public class Parser {
         String before = args.substring(0, idx).trim();
         String freq = args.substring(idx + 8).trim().toLowerCase();
         if (!VALID_FREQUENCIES.contains(freq)) {
-            throw new BobException(
+            throw new BobaException(
                     "Invalid frequency '" + freq + "'~\n"
                     + "    Use: daily, weekly, or monthly");
         }
@@ -176,12 +176,12 @@ public class Parser {
      *
      * @param args The task description.
      * @return A new Todo task.
-     * @throws BobException If the description is empty.
+     * @throws BobaException If the description is empty.
      */
-    public static Todo parseTodo(String args) throws BobException {
+    public static Todo parseTodo(String args) throws BobaException {
         String clean = sanitize(args);
         if (clean.isEmpty()) {
-            throw new BobException(
+            throw new BobaException(
                     "Uhh what's the task? Can't be empty~\n"
                     + "    Try: todo <description>");
         }
@@ -195,14 +195,14 @@ public class Parser {
      *
      * @param args The arguments containing description and deadline.
      * @return A new Deadline task.
-     * @throws BobException If the format is invalid or fields are missing.
+     * @throws BobaException If the format is invalid or fields are missing.
      */
-    public static Deadline parseDeadline(String args) throws BobException {
+    public static Deadline parseDeadline(String args) throws BobaException {
         String clean = sanitize(args);
         String[] rec = extractRecurrence(clean);
         String cleaned = rec[0];
         if (!cleaned.contains(" /by ")) {
-            throw new BobException("When's it due? Add /by <date>~\n"
+            throw new BobaException("When's it due? Add /by <date>~\n"
                     + "    Try: deadline <description> /by <when>");
         }
         rejectDuplicateFlag(cleaned, " /by ");
@@ -210,7 +210,7 @@ public class Parser {
         String description = parts[0].trim();
         String by = parts[1].trim();
         if (description.isEmpty() || by.isEmpty()) {
-            throw new BobException("Hmm something's missing there~\n"
+            throw new BobaException("Hmm something's missing there~\n"
                     + "    Try: deadline <description> /by <when>");
         }
         validateDate(by, "/by");
@@ -223,14 +223,14 @@ public class Parser {
      *
      * @param args The arguments containing description and time range.
      * @return A new Event task.
-     * @throws BobException If the format is invalid or fields are missing.
+     * @throws BobaException If the format is invalid or fields are missing.
      */
-    public static Event parseEvent(String args) throws BobException {
+    public static Event parseEvent(String args) throws BobaException {
         String clean = sanitize(args);
         String[] rec = extractRecurrence(clean);
         String cleaned = rec[0];
         if (!cleaned.contains(" /from ") || !cleaned.contains(" /to ")) {
-            throw new BobException("I need both /from and /to times~\n"
+            throw new BobaException("I need both /from and /to times~\n"
                     + "    Try: event <description> /from <start>"
                     + " /to <end>");
         }
@@ -242,7 +242,7 @@ public class Parser {
         String from = timeParts[0].trim();
         String to = timeParts[1].trim();
         if (description.isEmpty() || from.isEmpty() || to.isEmpty()) {
-            throw new BobException("Hmm something's missing there~\n"
+            throw new BobaException("Hmm something's missing there~\n"
                     + "    Try: event <description> /from <start>"
                     + " /to <end>");
         }
@@ -258,14 +258,14 @@ public class Parser {
      *
      * @param args The arguments containing description and condition.
      * @return A new DoAfter task.
-     * @throws BobException If the format is invalid or fields are missing.
+     * @throws BobaException If the format is invalid or fields are missing.
      */
-    public static DoAfter parseDoAfter(String args) throws BobException {
+    public static DoAfter parseDoAfter(String args) throws BobaException {
         String clean = sanitize(args);
         String[] rec = extractRecurrence(clean);
         String cleaned = rec[0];
         if (!cleaned.contains(" /after ")) {
-            throw new BobException(
+            throw new BobaException(
                     "What should this be done after?~\n"
                     + "    Try: doafter <description>"
                     + " /after <time or task>");
@@ -274,7 +274,7 @@ public class Parser {
         String description = parts[0].trim();
         String after = parts[1].trim();
         if (description.isEmpty() || after.isEmpty()) {
-            throw new BobException(
+            throw new BobaException(
                     "Hmm something's missing there~\n"
                     + "    Try: doafter <description>"
                     + " /after <time or task>");
@@ -289,15 +289,15 @@ public class Parser {
      *
      * @param args The arguments containing description and period.
      * @return A new DoWithin task.
-     * @throws BobException If the format is invalid or fields missing.
+     * @throws BobaException If the format is invalid or fields missing.
      */
     public static DoWithin parseDoWithin(String args)
-            throws BobException {
+            throws BobaException {
         String clean = sanitize(args);
         String[] rec = extractRecurrence(clean);
         String cleaned = rec[0];
         if (!cleaned.contains(" /between ") || !cleaned.contains(" /and ")) {
-            throw new BobException(
+            throw new BobaException(
                     "I need both /between and /and~\n"
                     + "    Try: dowithin <description>"
                     + " /between <start> /and <end>");
@@ -311,7 +311,7 @@ public class Parser {
         String end = periodParts[1].trim();
         if (description.isEmpty() || start.isEmpty()
                 || end.isEmpty()) {
-            throw new BobException(
+            throw new BobaException(
                     "Hmm something's missing there~\n"
                     + "    Try: dowithin <description>"
                     + " /between <start> /and <end>");
@@ -329,15 +329,15 @@ public class Parser {
      *
      * @param args The arguments containing description and duration.
      * @return A new FixedDuration task.
-     * @throws BobException If the format is invalid or fields missing.
+     * @throws BobaException If the format is invalid or fields missing.
      */
     public static FixedDuration parseFixedDuration(String args)
-            throws BobException {
+            throws BobaException {
         String clean = sanitize(args);
         String[] rec = extractRecurrence(clean);
         String cleaned = rec[0];
         if (!cleaned.contains(" /needs ")) {
-            throw new BobException(
+            throw new BobaException(
                     "How long does this task take?~\n"
                     + "    Try: fixed <description>"
                     + " /needs <duration>");
@@ -346,7 +346,7 @@ public class Parser {
         String description = parts[0].trim();
         String duration = parts[1].trim();
         if (description.isEmpty() || duration.isEmpty()) {
-            throw new BobException(
+            throw new BobaException(
                     "Hmm something's missing there~\n"
                     + "    Try: fixed <description>"
                     + " /needs <duration>");
@@ -361,13 +361,13 @@ public class Parser {
      *
      * @param args The arguments after the snooze command.
      * @return A String array of [taskIndex (0-based as string), newDate].
-     * @throws BobException If the format is invalid.
+     * @throws BobaException If the format is invalid.
      */
     public static String[] parseSnoozeDeadline(String args)
-            throws BobException {
+            throws BobaException {
         String clean = sanitize(args);
         if (!clean.contains(" /to ")) {
-            throw new BobException(
+            throw new BobaException(
                     "When should I reschedule it to?~\n"
                     + "    Deadline: snooze <task#> /to <new date>\n"
                     + "    Event: snooze <task#> /from <start>"
@@ -377,18 +377,18 @@ public class Parser {
         String indexStr = parts[0].trim();
         String newDate = parts[1].trim();
         if (newDate.isEmpty()) {
-            throw new BobException("The new date can't be empty~");
+            throw new BobaException("The new date can't be empty~");
         }
         validateDate(newDate, "/to");
         try {
             int index = Integer.parseInt(indexStr) - 1;
             if (index < 0) {
-                throw new BobException(
+                throw new BobaException(
                         "Task number must be positive~");
             }
             return new String[]{String.valueOf(index), newDate};
         } catch (NumberFormatException e) {
-            throw new BobException("That's not a valid task number~\n"
+            throw new BobaException("That's not a valid task number~\n"
                     + "    Try: snooze <task#> /to <new date>");
         }
     }
@@ -399,13 +399,13 @@ public class Parser {
      *
      * @param args The arguments after the snooze command.
      * @return A String array of [taskIndex (0-based as string), from, to].
-     * @throws BobException If the format is invalid.
+     * @throws BobaException If the format is invalid.
      */
     public static String[] parseSnoozeEvent(String args)
-            throws BobException {
+            throws BobaException {
         String clean = sanitize(args);
         if (!clean.contains(" /from ") || !clean.contains(" /to ")) {
-            throw new BobException(
+            throw new BobaException(
                     "Both /from and /to are needed~\n"
                     + "    Try: snooze <task#> /from <start>"
                     + " /to <end>");
@@ -416,7 +416,7 @@ public class Parser {
         String newFrom = timeParts[0].trim();
         String newTo = timeParts[1].trim();
         if (newFrom.isEmpty() || newTo.isEmpty()) {
-            throw new BobException(
+            throw new BobaException(
                     "Both /from and /to are needed~\n"
                     + "    Try: snooze <task#> /from <start>"
                     + " /to <end>");
@@ -427,12 +427,12 @@ public class Parser {
         try {
             int index = Integer.parseInt(indexStr) - 1;
             if (index < 0) {
-                throw new BobException(
+                throw new BobaException(
                         "Task number must be positive~");
             }
             return new String[]{String.valueOf(index), newFrom, newTo};
         } catch (NumberFormatException e) {
-            throw new BobException("That's not a valid task number~\n"
+            throw new BobaException("That's not a valid task number~\n"
                     + "    Try: snooze <task#> /from <start>"
                     + " /to <end>");
         }
@@ -444,19 +444,19 @@ public class Parser {
      *
      * @param args The arguments containing description and time slots.
      * @return A new TentativeEvent.
-     * @throws BobException If the format is invalid or fewer than 2 slots.
+     * @throws BobaException If the format is invalid or fewer than 2 slots.
      */
-    public static TentativeEvent parseTentative(String args) throws BobException {
+    public static TentativeEvent parseTentative(String args) throws BobaException {
         String clean = sanitize(args);
         if (!clean.contains(" /slot ")) {
-            throw new BobException("I need time slots for tentative events~\n"
+            throw new BobaException("I need time slots for tentative events~\n"
                     + "    Try: tentative <description> /slot <from> - <to>"
                     + " /slot <from> - <to>");
         }
         String[] parts = clean.split(" /slot ");
         String description = parts[0].trim();
         if (description.isEmpty()) {
-            throw new BobException("What's the event called?~\n"
+            throw new BobaException("What's the event called?~\n"
                     + "    Try: tentative <description> /slot ...");
         }
 
@@ -464,7 +464,7 @@ public class Parser {
         for (int i = 1; i < parts.length; i++) {
             String slotStr = parts[i].trim();
             if (!slotStr.contains(" - ")) {
-                throw new BobException("Each slot needs a"
+                throw new BobaException("Each slot needs a"
                         + " 'from - to' format~\n"
                         + "    e.g. /slot Mon 2pm - 4pm");
             }
@@ -472,14 +472,14 @@ public class Parser {
             String slotFrom = timeParts[0].trim();
             String slotTo = timeParts[1].trim();
             if (slotFrom.isEmpty() || slotTo.isEmpty()) {
-                throw new BobException("Slot " + i
+                throw new BobaException("Slot " + i
                         + " has empty from/to~");
             }
             slots.add(new String[]{slotFrom, slotTo});
         }
 
         if (slots.size() < 2) {
-            throw new BobException("Need at least 2 time slots for"
+            throw new BobaException("Need at least 2 time slots for"
                     + " tentative scheduling~\n"
                     + "    Try adding more /slot entries!");
         }
@@ -492,12 +492,12 @@ public class Parser {
      *
      * @param args The arguments after the confirm command.
      * @return An int array of [taskIndex (0-based), slotIndex (0-based)].
-     * @throws BobException If the format is invalid.
+     * @throws BobaException If the format is invalid.
      */
-    public static int[] parseConfirm(String args) throws BobException {
+    public static int[] parseConfirm(String args) throws BobaException {
         String clean = sanitize(args);
         if (!clean.contains(" /slot ")) {
-            throw new BobException("Which slot to confirm?~\n"
+            throw new BobaException("Which slot to confirm?~\n"
                     + "    Try: confirm <task#> /slot <slot#>");
         }
         String[] parts = clean.split(" /slot ");
@@ -506,7 +506,7 @@ public class Parser {
             int slotIndex = Integer.parseInt(parts[1].trim()) - 1;
             return new int[]{taskIndex, slotIndex};
         } catch (NumberFormatException e) {
-            throw new BobException("Those don't look like numbers~\n"
+            throw new BobaException("Those don't look like numbers~\n"
                     + "    Try: confirm <task#> /slot <slot#>");
         }
     }
