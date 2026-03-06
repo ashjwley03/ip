@@ -1,10 +1,10 @@
 .root-pane {
-    -fx-background-color: #f5f0eb;
+    -fx-background-color: #faf5ef;
 }
 
 /* ── Scroll pane ─────────────────────────── */
 .chat-scroll {
-    -fx-background: #f5f0eb;
+    -fx-background: #faf5ef;
     -fx-background-color: transparent;
 }
 
@@ -21,41 +21,41 @@
 }
 
 .chat-scroll .scroll-bar:vertical .thumb {
-    -fx-background-color: #c4b8ae;
+    -fx-background-color: #c9ad91;
     -fx-background-radius: 3px;
 }
 
 /* ── Dialog container ────────────────────── */
 .dialog-container {
-    -fx-background-color: #f5f0eb;
+    -fx-background-color: #faf5ef;
     -fx-padding: 8 0 8 0;
 }
 
 /* ── Input bar ───────────────────────────── */
 .input-bar {
-    -fx-background-color: #efe8e1;
+    -fx-background-color: #f0e6d8;
     -fx-padding: 8;
-    -fx-border-color: #ddd3c9 transparent transparent transparent;
+    -fx-border-color: #ddd0c0 transparent transparent transparent;
     -fx-border-width: 1 0 0 0;
 }
 
 .input-field {
     -fx-background-color: #ffffff;
     -fx-background-radius: 18;
-    -fx-border-color: #d4c9be;
+    -fx-border-color: #d4c4b0;
     -fx-border-radius: 18;
     -fx-padding: 8 14 8 14;
     -fx-font-size: 13px;
     -fx-font-family: "System";
-    -fx-prompt-text-fill: #a89888;
+    -fx-prompt-text-fill: #a89080;
 }
 
 .input-field:focused {
-    -fx-border-color: #c49b7c;
+    -fx-border-color: #b8865a;
 }
 
 .send-button {
-    -fx-background-color: #c49b7c;
+    -fx-background-color: #8b5e3c;
     -fx-text-fill: white;
     -fx-font-size: 13px;
     -fx-font-weight: bold;
@@ -66,11 +66,11 @@
 }
 
 .send-button:hover {
-    -fx-background-color: #b58a6b;
+    -fx-background-color: #7a4f30;
 }
 
 .send-button:pressed {
-    -fx-background-color: #a0785e;
+    -fx-background-color: #694226;
 }
 
 /* ── Name labels ─────────────────────────── */
@@ -84,7 +84,7 @@
 }
 
 .name-boba {
-    -fx-text-fill: #b07850;
+    -fx-text-fill: #8b5e3c;
     -fx-font-weight: bold;
 }
 
@@ -97,16 +97,16 @@
 }
 
 .bubble-user {
-    -fx-background-color: #d4c3b0;
+    -fx-background-color: #e8ddd0;
     -fx-background-radius: 14 14 4 14;
     -fx-text-fill: #3d3029;
 }
 
 .bubble-boba {
-    -fx-background-color: #ffffff;
+    -fx-background-color: #fff8f0;
     -fx-background-radius: 14 14 14 4;
     -fx-text-fill: #3d3029;
-    -fx-border-color: #e6ddd4;
+    -fx-border-color: #e8d8c4;
     -fx-border-radius: 14 14 14 4;
     -fx-border-width: 1;
 }

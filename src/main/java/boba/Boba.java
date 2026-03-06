@@ -19,6 +19,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * Main class for the Boba chatbot application.
@@ -70,10 +71,10 @@ public class Boba {
             } catch (BobException e) {
                 ui.showError(e.getMessage());
             } catch (NumberFormatException e) {
-                ui.showErrors("That's not a number silly~",
+                ui.showErrors("That's not a number, silly~",
                         "Try: " + command + " <number>");
             } catch (ArrayIndexOutOfBoundsException e) {
-                ui.showErrors("Hmm something's off with that format~",
+                ui.showErrors("Hmm that recipe doesn't look right~",
                         "Check your command and try again!");
             }
 
@@ -102,7 +103,7 @@ public class Boba {
         case "mark":
             int markIndex = Parser.parseIndex(input);
             if (markIndex < 0 || markIndex >= tasks.size()) {
-                ui.showErrors("Hmm that task doesn't exist!",
+                ui.showErrors("Hmm can't find that pearl!",
                         "You have " + tasks.size() + " task(s) btw~");
             } else {
                 tasks.get(markIndex).markAsDone();
@@ -111,7 +112,7 @@ public class Boba {
                         tasks.get(markIndex));
                 if (nextTask != null) {
                     tasks.add(nextTask);
-                    ui.showError("Recurring! Next: " + nextTask);
+                    ui.showError("Refill! Next: " + nextTask);
                 }
                 storage.save(tasks);
             }
@@ -119,7 +120,7 @@ public class Boba {
         case "unmark":
             int unmarkIndex = Parser.parseIndex(input);
             if (unmarkIndex < 0 || unmarkIndex >= tasks.size()) {
-                ui.showErrors("Hmm that task doesn't exist!",
+                ui.showErrors("Hmm can't find that pearl!",
                         "You have " + tasks.size() + " task(s) btw~");
             } else {
                 tasks.get(unmarkIndex).markAsNotDone();
@@ -151,7 +152,7 @@ public class Boba {
         case "delete":
             int deleteIndex = Parser.parseIndex(input);
             if (deleteIndex < 0 || deleteIndex >= tasks.size()) {
-                ui.showErrors("Hmm that task doesn't exist!",
+                ui.showErrors("Hmm can't find that pearl!",
                         "You have " + tasks.size() + " task(s) btw~");
             } else {
                 Task removed = tasks.delete(deleteIndex);
@@ -161,7 +162,7 @@ public class Boba {
             break;
         case "find":
             if (args.isEmpty()) {
-                ui.showErrors("What should I search for?~",
+                ui.showErrors("What flavor are we looking for?~",
                         "Try: find <keyword>");
             } else {
                 ui.showFoundTasks(tasks.find(args));
@@ -213,14 +214,17 @@ public class Boba {
         case "cheer":
             ui.showCheer(cheerLoader.getRandomQuote());
             break;
+        case "boba":
+            ui.showError(recommendBoba());
+            break;
         default:
-            ui.showErrors("Hmm I don't know that one~",
+            ui.showErrors("Hmm that's not on the menu~",
                     "Try: todo, deadline, event, doafter,"
                             + " dowithin, fixed, snooze,"
                             + " tentative, confirm, remind,"
                             + " freetime, schedule, list, mark,"
-                            + " unmark, delete, find, cheer,"
-                            + " or bye!");
+                            + " unmark, delete, find, boba,"
+                            + " cheer, or bye!");
             break;
         }
     }
@@ -230,7 +234,7 @@ public class Boba {
         int taskIdx = confirmArgs[0];
         int slotIdx = confirmArgs[1];
         if (taskIdx < 0 || taskIdx >= tasks.size()) {
-            ui.showErrors("Hmm that task doesn't exist!",
+            ui.showErrors("Hmm can't find that pearl!",
                     "You have " + tasks.size() + " task(s) btw~");
         } else if (!(tasks.get(taskIdx) instanceof TentativeEvent)) {
             ui.showError("That's not a tentative event~");
@@ -245,7 +249,7 @@ public class Boba {
                 tasks.delete(taskIdx);
                 tasks.add(confirmed);
                 storage.save(tasks);
-                ui.showError("Confirmed! Your event is now set:");
+                ui.showError("Sealed the lid! Event is set:");
                 ui.showError("  " + confirmed);
             }
         }
@@ -265,7 +269,7 @@ public class Boba {
         try {
             switch (command) {
             case "bye":
-                response.append("Bye bye :) Hope to see you again soon! \u2661");
+                response.append("Bye bye! Stay sweet like brown sugar boba~ \u2661");
                 break;
 
             case "list":
@@ -279,7 +283,7 @@ public class Boba {
                 } else {
                     tasks.get(markIndex).markAsDone();
                     response.append(
-                            "Yay you did it!! \u2606\uff9f.*\uff65\uff61\uff9f\n");
+                            "Nice, one less pearl to chew on! \uD83E\uDD64\n");
                     response.append(tasks.get(markIndex));
                     Task nextTask = createNextIfRecurring(
                             tasks.get(markIndex));
@@ -300,8 +304,8 @@ public class Boba {
                 } else {
                     tasks.get(unmarkIndex).markAsNotDone();
                     storage.save(tasks);
-                    response.append("No worries, we all need more time"
-                            + " sometimes~\n");
+                    response.append("No rush~ let it steep a "
+                            + "little longer!\n");
                     response.append(tasks.get(unmarkIndex));
                 }
                 break;
@@ -325,10 +329,11 @@ public class Boba {
                 } else {
                     Task removed = tasks.delete(deleteIndex);
                     storage.save(tasks);
-                    response.append("Alright, I've removed this task~\n");
+                    response.append("Tossed it out like old tea "
+                            + "leaves~\n");
                     response.append("  " + removed + "\n");
                     response.append("Now you have " + tasks.size()
-                            + " task(s) in the list.");
+                            + " task(s) in the cup.");
                 }
                 break;
 
@@ -377,26 +382,24 @@ public class Boba {
                 break;
 
             case "cheer":
-                response.append("\u2728 " + cheerLoader.getRandomQuote()
-                        + " \u2728");
+                response.append("\uD83E\uDD64 "
+                        + cheerLoader.getRandomQuote()
+                        + " \uD83E\uDD64");
                 break;
-
+            case "boba":
+                response.append(recommendBoba());
+                break;
             default:
-                response.append("Hmm I don't know that one~\n");
-                response.append("Try: todo, deadline, event, doafter,"
-                        + " dowithin, fixed, snooze, tentative,"
-                        + " confirm, remind, freetime, schedule,"
-                        + " list, mark, unmark, delete, find,"
-                        + " cheer, or bye!");
+                response.append(getUnknownCommandMessage());
                 break;
             }
         } catch (BobException e) {
             response.append(e.getMessage());
         } catch (NumberFormatException e) {
-            response.append("That's not a number silly~\n");
+            response.append("That's not a number, silly~\n");
             response.append("Try: " + command + " <number>");
         } catch (ArrayIndexOutOfBoundsException e) {
-            response.append("Hmm something's off with that format~\n");
+            response.append("Hmm that recipe doesn't look right~\n");
             response.append("Check your command and try again!");
         }
 
@@ -453,7 +456,7 @@ public class Boba {
         }
 
         if (overdue.isEmpty() && upcoming.isEmpty()) {
-            return "\u2705 No urgent reminders! You're all caught up~";
+            return "\u2705 No urgent reminders! Sip and relax~";
         }
 
         StringBuilder sb = new StringBuilder();
@@ -654,18 +657,27 @@ public class Boba {
     }
 
     private String formatInvalidIndexError() {
-        return "Hmm that task doesn't exist!\n"
+        return "Hmm can't find that pearl in the cup!\n"
                 + "You have " + tasks.size() + " task(s) btw~";
+    }
+
+    private String getUnknownCommandMessage() {
+        return "Hmm that's not on the menu~\n"
+                + "Try: todo, deadline, event, doafter,"
+                + " dowithin, fixed, snooze, tentative,"
+                + " confirm, remind, freetime, schedule,"
+                + " list, mark, unmark, delete, find,"
+                + " boba, cheer, or bye!";
     }
 
     private String addTaskAndRespond(Task task) {
         String warnings = detectAnomalies(task);
         tasks.add(task);
         storage.save(tasks);
-        String base = "Got it! I've added this task \u273F\n"
+        String base = "Dropped a new pearl in! \uD83E\uDD64\n"
                 + "  " + task + "\n"
                 + "Now you have " + tasks.size()
-                + " task(s) in the list~";
+                + " task(s) in the cup~";
         if (!warnings.isEmpty()) {
             return base + "\n\n" + warnings;
         }
@@ -760,7 +772,7 @@ public class Boba {
 
     private String formatTaskList() {
         StringBuilder sb = new StringBuilder(
-                "Okie here's everything on your plate~ \uD83C\uDF61\n");
+                "Here's what's brewing in your cup~ \uD83E\uDD64\n");
         for (int i = 0; i < tasks.size(); i++) {
             sb.append((i + 1) + "." + tasks.get(i));
             if (i < tasks.size() - 1) {
@@ -776,7 +788,7 @@ public class Boba {
             String[] parsed = Parser.parseSnoozeEvent(args);
             int idx = Integer.parseInt(parsed[0]);
             if (idx < 0 || idx >= tasks.size()) {
-                ui.showErrors("Hmm that task doesn't exist!",
+                ui.showErrors("Hmm can't find that pearl!",
                         "You have " + tasks.size() + " task(s) btw~");
             } else if (!(tasks.get(idx) instanceof Event)) {
                 ui.showError("That's not an event task~");
@@ -784,14 +796,14 @@ public class Boba {
                 Event e = (Event) tasks.get(idx);
                 e.reschedule(parsed[1], parsed[2]);
                 storage.save(tasks);
-                ui.showError("Snoozed! Here's the updated task:");
+                ui.showError("Pushed it back~ new brew time:");
                 ui.showError("  " + e);
             }
         } else {
             String[] parsed = Parser.parseSnoozeDeadline(args);
             int idx = Integer.parseInt(parsed[0]);
             if (idx < 0 || idx >= tasks.size()) {
-                ui.showErrors("Hmm that task doesn't exist!",
+                ui.showErrors("Hmm can't find that pearl!",
                         "You have " + tasks.size() + " task(s) btw~");
             } else if (!(tasks.get(idx) instanceof Deadline)) {
                 ui.showError("That's not a deadline task~\n"
@@ -801,7 +813,7 @@ public class Boba {
                 Deadline d = (Deadline) tasks.get(idx);
                 d.reschedule(parsed[1]);
                 storage.save(tasks);
-                ui.showError("Snoozed! Here's the updated task:");
+                ui.showError("Pushed it back~ new brew time:");
                 ui.showError("  " + d);
             }
         }
@@ -822,7 +834,8 @@ public class Boba {
             Event e = (Event) tasks.get(idx);
             e.reschedule(parsed[1], parsed[2]);
             storage.save(tasks);
-            return "Snoozed! Here's the updated task \u23F0\n  " + e;
+            return "Pushed it back~ new brew time \uD83E\uDD64\n  "
+                    + e;
         } else {
             String[] parsed = Parser.parseSnoozeDeadline(args);
             int idx = Integer.parseInt(parsed[0]);
@@ -837,7 +850,8 @@ public class Boba {
             Deadline d = (Deadline) tasks.get(idx);
             d.reschedule(parsed[1]);
             storage.save(tasks);
-            return "Snoozed! Here's the updated task \u23F0\n  " + d;
+            return "Pushed it back~ new brew time \uD83E\uDD64\n  "
+                    + d;
         }
     }
 
@@ -862,7 +876,7 @@ public class Boba {
         String warnings = detectAnomalies(confirmed);
         tasks.add(confirmed);
         storage.save(tasks);
-        String base = "Confirmed! Your event is now set \u2728\n  "
+        String base = "Sealed the lid! Your event is set \uD83E\uDD64\n  "
                 + confirmed;
         if (!warnings.isEmpty()) {
             return base + "\n\n" + warnings;
@@ -870,16 +884,48 @@ public class Boba {
         return base;
     }
 
+    private String recommendBoba() {
+        String[][] drinks = {
+            {"Brown Sugar Boba Milk", "Rich, caramelly, and chewy "
+                    + "-- the classic that started it all!"},
+            {"Taro Milk Tea", "Creamy purple goodness~ "
+                    + "sweet and nutty like a hug in a cup."},
+            {"Matcha Latte with Boba", "Earthy meets chewy! "
+                    + "For when you need zen AND energy."},
+            {"Mango Pomelo Sago", "Tropical, fruity, refreshing "
+                    + "-- perfect for a sunny day!"},
+            {"Oolong Milk Tea", "Smooth and fragrant~ "
+                    + "a sophisticated sip for the refined palate."},
+            {"Strawberry Jasmine Tea", "Floral and berry-sweet~ "
+                    + "like spring in a cup!"},
+            {"Thai Milk Tea", "Bold and spiced with that "
+                    + "gorgeous sunset-orange color!"},
+            {"Wintermelon Lemon", "Cool and citrusy~ "
+                    + "when life gives you lemons, add boba!"},
+            {"Honeydew Slush", "Icy melon bliss~ "
+                    + "brain freeze never tasted so good."},
+            {"Rose Lychee Tea", "Floral, fruity, fancy~ "
+                    + "treat yourself, you deserve it!"},
+        };
+        Random rand = new Random();
+        int idx = rand.nextInt(drinks.length);
+        return "\uD83E\uDD64 Today I recommend...\n\n"
+                + "  \u2B50 " + drinks[idx][0] + "\n"
+                + "  " + drinks[idx][1] + "\n\n"
+                + "Wanna hear another? Just type boba again!";
+    }
+
     private String findAndRespond(String keyword) {
         if (keyword.isEmpty()) {
-            return "What should I search for?~\nTry: find <keyword>";
+            return "What flavor are we looking for?~\n"
+                    + "Try: find <keyword>";
         }
         ArrayList<Task> matches = tasks.find(keyword);
         if (matches.isEmpty()) {
-            return "Hmm no tasks match that keyword~";
+            return "Hmm that flavor's not in the cup~";
         }
         StringBuilder sb = new StringBuilder(
-                "Here are the matching tasks in your list~ \u273F\n");
+                "Found these matching pearls! \uD83E\uDD64\n");
         for (int i = 0; i < matches.size(); i++) {
             sb.append((i + 1) + "." + matches.get(i));
             if (i < matches.size() - 1) {

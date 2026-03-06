@@ -33,8 +33,9 @@ public class MainWindow extends AnchorPane {
         scrollPane.vvalueProperty().bind(
                 dialogContainer.heightProperty());
         addDialogs(DialogBox.getBobaDialog(
-                "Hii! I'm Boba \u25D5\u203F\u25D5\n"
-                        + "What can I do for you today?",
+                "Hii! I'm Boba, your bubbly assistant~ "
+                        + "\uD83E\uDD64\nWhat can I brew up "
+                        + "for you today?",
                 bobaImage));
     }
 
@@ -60,7 +61,7 @@ public class MainWindow extends AnchorPane {
         return response.startsWith("Hmm")
                 || response.startsWith("Invalid")
                 || response.startsWith("That's not")
-                || response.startsWith("What should");
+                || response.startsWith("What flavor");
     }
 
     @FXML
