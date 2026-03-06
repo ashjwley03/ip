@@ -50,12 +50,26 @@ public class Event extends Task {
     }
 
     /**
+     * Creates a new Event with the same details and recurrence.
+     *
+     * @param frequency The recurrence (daily/weekly/monthly).
+     * @return A new undone Event with the same time and recurrence.
+     */
+    public Event createNextOccurrence(String frequency) {
+        Event e = new Event(description, from, to);
+        e.setRecurrence(frequency);
+        return e;
+    }
+
+    /**
      * Returns a string representation of this event task.
      *
      * @return A string in the format "[E][status] description (from: start to: end)".
      */
     @Override
     public String toString() {
-        return "[E][" + getStatusIcon() + "] " + description + " (from: " + from + " to: " + to + ")";
+        return "[E][" + getStatusIcon() + "] " + getRecurrenceTag()
+                + description + " (from: " + from + " to: " + to
+                + ")";
     }
 }

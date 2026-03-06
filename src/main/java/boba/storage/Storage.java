@@ -79,7 +79,16 @@ public class Storage {
      */
     private Task parseTask(String line) {
         try {
-            String[] parts = line.split(" \\| ");
+            String recurrence = null;
+            String cleanedLine = line;
+            if (line.endsWith(" | R:daily") || line.endsWith(" | R:weekly")
+                    || line.endsWith(" | R:monthly")) {
+                int rIdx = line.lastIndexOf(" | R:");
+                recurrence = line.substring(rIdx + 5);
+                cleanedLine = line.substring(0, rIdx);
+            }
+
+            String[] parts = cleanedLine.split(" \\| ");
             String type = parts[0];
             boolean isDone = parts[1].equals("1");
             String description = parts[2];
@@ -106,8 +115,13 @@ public class Storage {
                 break;
             }
 
-            if (task != null && isDone) {
-                task.markAsDone();
+            if (task != null) {
+                if (isDone) {
+                    task.markAsDone();
+                }
+                if (recurrence != null) {
+                    task.setRecurrence(recurrence);
+                }
             }
             return task;
         } catch (Exception e) {
@@ -149,13 +163,15 @@ public class Storage {
     private String taskToString(Task task) {
         String status = task.isDone() ? "1" : "0";
         String description = task.getDescription();
+        String recSuffix = task.isRecurring()
+                ? " | R:" + task.getRecurrence() : "";
 
         if (task instanceof Todo) {
-            return "T | " + status + " | " + description;
+            return "T | " + status + " | " + description + recSuffix;
         } else if (task instanceof Deadline) {
             Deadline d = (Deadline) task;
             return "D | " + status + " | " + description
-                    + " | " + d.getByForStorage();
+                    + " | " + d.getByForStorage() + recSuffix;
         } else if (task instanceof TentativeEvent) {
             TentativeEvent te = (TentativeEvent) task;
             StringBuilder sb = new StringBuilder();
@@ -163,11 +179,13 @@ public class Storage {
             for (String[] slot : te.getSlots()) {
                 sb.append(" | " + slot[0] + " | " + slot[1]);
             }
+            sb.append(recSuffix);
             return sb.toString();
         } else if (task instanceof Event) {
             Event e = (Event) task;
             return "E | " + status + " | " + description
-                    + " | " + e.getFrom() + " | " + e.getTo();
+                    + " | " + e.getFrom() + " | " + e.getTo()
+                    + recSuffix;
         }
         return "";
     }

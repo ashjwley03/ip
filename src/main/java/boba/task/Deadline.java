@@ -3,6 +3,7 @@ package boba.task;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoUnit;
 
 /**
  * Represents a task with a deadline.
@@ -64,6 +65,56 @@ public class Deadline extends Task {
     }
 
     /**
+     * Returns whether this deadline has a parseable date.
+     *
+     * @return True if the deadline has a LocalDate.
+     */
+    public boolean hasDate() {
+        return hasDate;
+    }
+
+    /**
+     * Returns the deadline date, or null if not parseable.
+     *
+     * @return The LocalDate, or null.
+     */
+    public LocalDate getByDate() {
+        return byDate;
+    }
+
+    /**
+     * Creates a new Deadline advanced by the given recurrence period.
+     *
+     * @param frequency The recurrence (daily/weekly/monthly).
+     * @return A new Deadline with the advanced date and same recurrence.
+     */
+    public Deadline createNextOccurrence(String frequency) {
+        String nextBy;
+        if (hasDate) {
+            LocalDate next = advanceDate(byDate, frequency);
+            nextBy = next.toString();
+        } else {
+            nextBy = byString;
+        }
+        Deadline d = new Deadline(description, nextBy);
+        d.setRecurrence(frequency);
+        return d;
+    }
+
+    private static LocalDate advanceDate(LocalDate date, String freq) {
+        switch (freq) {
+        case "daily":
+            return date.plus(1, ChronoUnit.DAYS);
+        case "weekly":
+            return date.plus(1, ChronoUnit.WEEKS);
+        case "monthly":
+            return date.plus(1, ChronoUnit.MONTHS);
+        default:
+            return date;
+        }
+    }
+
+    /**
      * Returns a string representation of this deadline task.
      * If the deadline is a valid date, it is displayed in "MMM d yyyy" format.
      *
@@ -77,6 +128,7 @@ public class Deadline extends Task {
         } else {
             byDisplay = byString;
         }
-        return "[D][" + getStatusIcon() + "] " + description + " (by: " + byDisplay + ")";
+        return "[D][" + getStatusIcon() + "] " + getRecurrenceTag()
+                + description + " (by: " + byDisplay + ")";
     }
 }

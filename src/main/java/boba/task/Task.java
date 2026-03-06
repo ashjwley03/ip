@@ -7,6 +7,7 @@ package boba.task;
 public class Task {
     protected String description;
     protected boolean isDone;
+    protected String recurrence;
 
     /**
      * Creates a new task with the given description.
@@ -19,6 +20,7 @@ public class Task {
         assert !description.trim().isEmpty() : "Task description should not be empty";
         this.description = description;
         this.isDone = false;
+        this.recurrence = null;
     }
 
     /**
@@ -63,12 +65,52 @@ public class Task {
     }
 
     /**
+     * Returns the recurrence frequency, or null if not recurring.
+     *
+     * @return The recurrence string (daily/weekly/monthly), or null.
+     */
+    public String getRecurrence() {
+        return recurrence;
+    }
+
+    /**
+     * Sets the recurrence frequency.
+     *
+     * @param recurrence The frequency (daily/weekly/monthly), or null.
+     */
+    public void setRecurrence(String recurrence) {
+        this.recurrence = recurrence;
+    }
+
+    /**
+     * Returns whether this task is recurring.
+     *
+     * @return True if the task has a recurrence set.
+     */
+    public boolean isRecurring() {
+        return recurrence != null;
+    }
+
+    /**
+     * Returns a tag showing the recurrence, or empty if not recurring.
+     *
+     * @return A string like "[R:weekly]" or empty string.
+     */
+    protected String getRecurrenceTag() {
+        if (recurrence == null) {
+            return "";
+        }
+        return "[R:" + recurrence + "] ";
+    }
+
+    /**
      * Returns a string representation of this task.
      *
      * @return A string showing the task's status and description.
      */
     @Override
     public String toString() {
-        return "[" + getStatusIcon() + "] " + description;
+        return "[" + getStatusIcon() + "] " + getRecurrenceTag()
+                + description;
     }
 }

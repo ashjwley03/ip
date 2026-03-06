@@ -3,16 +3,53 @@ package boba.parser;
 import boba.exception.BobException;
 import boba.task.Deadline;
 import boba.task.Event;
+import boba.task.Task;
 import boba.task.TentativeEvent;
 import boba.task.Todo;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Provides utility methods for parsing user input commands.
  */
 public class Parser {
+
+    private static final Set<String> VALID_FREQUENCIES =
+            Set.of("daily", "weekly", "monthly");
+
+    /**
+     * Extracts a "/every frequency" suffix from args if present.
+     * Returns a 2-element array: [argsWithoutEvery, frequency].
+     * If no /every is found, frequency is null.
+     */
+    private static String[] extractRecurrence(String args)
+            throws BobException {
+        if (!args.contains(" /every ")) {
+            return new String[]{args, null};
+        }
+        int idx = args.lastIndexOf(" /every ");
+        String before = args.substring(0, idx).trim();
+        String freq = args.substring(idx + 8).trim().toLowerCase();
+        if (!VALID_FREQUENCIES.contains(freq)) {
+            throw new BobException(
+                    "Invalid frequency '" + freq + "'~\n"
+                    + "    Use: daily, weekly, or monthly");
+        }
+        return new String[]{before, freq};
+    }
+
+    /**
+     * Applies the parsed recurrence to a task, if any.
+     */
+    private static <T extends Task> T applyRecurrence(
+            T task, String frequency) {
+        if (frequency != null) {
+            task.setRecurrence(frequency);
+        }
+        return task;
+    }
 
     /**
      * Extracts the command word from user input.
@@ -65,9 +102,12 @@ public class Parser {
      */
     public static Todo parseTodo(String args) throws BobException {
         if (args.isEmpty()) {
-            throw new BobException("Uhh what's the task? Can't be empty~\n    Try: todo <description>");
+            throw new BobException(
+                    "Uhh what's the task? Can't be empty~\n"
+                    + "    Try: todo <description>");
         }
-        return new Todo(args);
+        String[] rec = extractRecurrence(args);
+        return applyRecurrence(new Todo(rec[0]), rec[1]);
     }
 
     /**
@@ -79,18 +119,20 @@ public class Parser {
      * @throws BobException If the format is invalid or fields are missing.
      */
     public static Deadline parseDeadline(String args) throws BobException {
-        if (!args.contains(" /by ")) {
+        String[] rec = extractRecurrence(args);
+        String cleaned = rec[0];
+        if (!cleaned.contains(" /by ")) {
             throw new BobException("When's it due? Add /by <date>~\n"
                     + "    Try: deadline <description> /by <when>");
         }
-        String[] parts = args.split(" /by ");
+        String[] parts = cleaned.split(" /by ");
         String description = parts[0].trim();
         String by = parts[1].trim();
         if (description.isEmpty() || by.isEmpty()) {
             throw new BobException("Hmm something's missing there~\n"
                     + "    Try: deadline <description> /by <when>");
         }
-        return new Deadline(description, by);
+        return applyRecurrence(new Deadline(description, by), rec[1]);
     }
 
     /**
@@ -102,20 +144,24 @@ public class Parser {
      * @throws BobException If the format is invalid or fields are missing.
      */
     public static Event parseEvent(String args) throws BobException {
-        if (!args.contains(" /from ") || !args.contains(" /to ")) {
+        String[] rec = extractRecurrence(args);
+        String cleaned = rec[0];
+        if (!cleaned.contains(" /from ") || !cleaned.contains(" /to ")) {
             throw new BobException("I need both /from and /to times~\n"
-                    + "    Try: event <description> /from <start> /to <end>");
+                    + "    Try: event <description> /from <start>"
+                    + " /to <end>");
         }
-        String[] parts = args.split(" /from ");
+        String[] parts = cleaned.split(" /from ");
         String description = parts[0].trim();
         String[] timeParts = parts[1].split(" /to ");
         String from = timeParts[0].trim();
         String to = timeParts[1].trim();
         if (description.isEmpty() || from.isEmpty() || to.isEmpty()) {
             throw new BobException("Hmm something's missing there~\n"
-                    + "    Try: event <description> /from <start> /to <end>");
+                    + "    Try: event <description> /from <start>"
+                    + " /to <end>");
         }
-        return new Event(description, from, to);
+        return applyRecurrence(new Event(description, from, to), rec[1]);
     }
 
     /**

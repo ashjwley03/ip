@@ -93,8 +93,14 @@ public class Boba {
                         "You have " + tasks.size() + " task(s) btw~");
             } else {
                 tasks.get(markIndex).markAsDone();
-                storage.save(tasks);
                 ui.showTaskMarked(tasks.get(markIndex));
+                Task nextTask = createNextIfRecurring(
+                        tasks.get(markIndex));
+                if (nextTask != null) {
+                    tasks.add(nextTask);
+                    ui.showError("Recurring! Next: " + nextTask);
+                }
+                storage.save(tasks);
             }
             break;
         case "unmark":
@@ -223,9 +229,18 @@ public class Boba {
                     response.append(formatInvalidIndexError());
                 } else {
                     tasks.get(markIndex).markAsDone();
-                    storage.save(tasks);
-                    response.append("Yay you did it!! \u2606\uff9f.*\uff65\uff61\uff9f\n");
+                    response.append(
+                            "Yay you did it!! \u2606\uff9f.*\uff65\uff61\uff9f\n");
                     response.append(tasks.get(markIndex));
+                    Task nextTask = createNextIfRecurring(
+                            tasks.get(markIndex));
+                    if (nextTask != null) {
+                        tasks.add(nextTask);
+                        response.append(
+                                "\n\n\uD83D\uDD01 Recurring! Next:\n  "
+                                + nextTask);
+                    }
+                    storage.save(tasks);
                 }
                 break;
 
@@ -307,6 +322,21 @@ public class Boba {
         }
 
         return response.toString();
+    }
+
+    private Task createNextIfRecurring(Task task) {
+        if (!task.isRecurring()) {
+            return null;
+        }
+        String freq = task.getRecurrence();
+        if (task instanceof Deadline) {
+            return ((Deadline) task).createNextOccurrence(freq);
+        } else if (task instanceof Event) {
+            return ((Event) task).createNextOccurrence(freq);
+        } else if (task instanceof Todo) {
+            return ((Todo) task).createNextOccurrence(freq);
+        }
+        return null;
     }
 
     private boolean isValidIndex(int index) {
