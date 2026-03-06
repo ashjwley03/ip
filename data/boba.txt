@@ -1,2 +1,2 @@
 T | 0 | laundry
-E | 0 | birthday party | 6th March 5pm | 7pm
+E | 0 | birthday party | 6th march 5pm | 7pm
