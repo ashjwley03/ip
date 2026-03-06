@@ -3,7 +3,11 @@ package boba.parser;
 import boba.exception.BobException;
 import boba.task.Deadline;
 import boba.task.Event;
+import boba.task.TentativeEvent;
 import boba.task.Todo;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Provides utility methods for parsing user input commands.
@@ -112,5 +116,69 @@ public class Parser {
                     + "    Try: event <description> /from <start> /to <end>");
         }
         return new Event(description, from, to);
+    }
+
+    /**
+     * Parses arguments to create a TentativeEvent.
+     * Expected format: "description /slot from1 - to1 /slot from2 - to2 ..."
+     *
+     * @param args The arguments containing description and time slots.
+     * @return A new TentativeEvent.
+     * @throws BobException If the format is invalid or fewer than 2 slots.
+     */
+    public static TentativeEvent parseTentative(String args) throws BobException {
+        if (!args.contains(" /slot ")) {
+            throw new BobException("I need time slots for tentative events~\n"
+                    + "    Try: tentative <description> /slot <from> - <to>"
+                    + " /slot <from> - <to>");
+        }
+        String[] parts = args.split(" /slot ");
+        String description = parts[0].trim();
+        if (description.isEmpty()) {
+            throw new BobException("What's the event called?~\n"
+                    + "    Try: tentative <description> /slot ...");
+        }
+
+        List<String[]> slots = new ArrayList<>();
+        for (int i = 1; i < parts.length; i++) {
+            String slotStr = parts[i].trim();
+            if (!slotStr.contains(" - ")) {
+                throw new BobException("Each slot needs a 'from - to' format~\n"
+                        + "    e.g. /slot Mon 2pm - 4pm");
+            }
+            String[] timeParts = slotStr.split(" - ", 2);
+            slots.add(new String[]{timeParts[0].trim(), timeParts[1].trim()});
+        }
+
+        if (slots.size() < 2) {
+            throw new BobException("Need at least 2 time slots for"
+                    + " tentative scheduling~\n"
+                    + "    Try adding more /slot entries!");
+        }
+        return new TentativeEvent(description, slots);
+    }
+
+    /**
+     * Parses a confirm command to extract task index and slot number.
+     * Expected format: "confirm <taskIndex> /slot <slotNumber>"
+     *
+     * @param args The arguments after the confirm command.
+     * @return An int array of [taskIndex (0-based), slotIndex (0-based)].
+     * @throws BobException If the format is invalid.
+     */
+    public static int[] parseConfirm(String args) throws BobException {
+        if (!args.contains(" /slot ")) {
+            throw new BobException("Which slot to confirm?~\n"
+                    + "    Try: confirm <task#> /slot <slot#>");
+        }
+        String[] parts = args.split(" /slot ");
+        try {
+            int taskIndex = Integer.parseInt(parts[0].trim()) - 1;
+            int slotIndex = Integer.parseInt(parts[1].trim()) - 1;
+            return new int[]{taskIndex, slotIndex};
+        } catch (NumberFormatException e) {
+            throw new BobException("Those don't look like numbers~\n"
+                    + "    Try: confirm <task#> /slot <slot#>");
+        }
     }
 }

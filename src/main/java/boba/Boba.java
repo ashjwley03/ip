@@ -7,6 +7,7 @@ import boba.task.Deadline;
 import boba.task.Event;
 import boba.task.Task;
 import boba.task.TaskList;
+import boba.task.TentativeEvent;
 import boba.task.Todo;
 import boba.ui.Ui;
 import boba.util.CheerLoader;
@@ -130,13 +131,48 @@ public class Boba {
                     }
                     break;
 
+                case "tentative":
+                    TentativeEvent tentEvent = Parser.parseTentative(args);
+                    tasks.add(tentEvent);
+                    storage.save(tasks);
+                    ui.showTaskAdded(tentEvent, tasks.size());
+                    break;
+
+                case "confirm":
+                    int[] confirmArgs = Parser.parseConfirm(args);
+                    int taskIdx = confirmArgs[0];
+                    int slotIdx = confirmArgs[1];
+                    if (taskIdx < 0 || taskIdx >= tasks.size()) {
+                        ui.showErrors("Hmm that task doesn't exist!",
+                                "You have " + tasks.size() + " task(s) btw~");
+                    } else if (!(tasks.get(taskIdx) instanceof TentativeEvent)) {
+                        ui.showError("That's not a tentative event~");
+                    } else {
+                        TentativeEvent te = (TentativeEvent) tasks.get(taskIdx);
+                        if (slotIdx < 0 || slotIdx >= te.getSlotCount()) {
+                            ui.showErrors("Invalid slot number!",
+                                    "This event has " + te.getSlotCount()
+                                            + " slot(s).");
+                        } else {
+                            Event confirmed = te.confirm(slotIdx);
+                            tasks.delete(taskIdx);
+                            tasks.add(confirmed);
+                            storage.save(tasks);
+                            ui.showError("Confirmed! Your event is now set:");
+                            ui.showError("  " + confirmed);
+                        }
+                    }
+                    break;
+
                 case "cheer":
                     ui.showCheer(cheerLoader.getRandomQuote());
                     break;
 
                 default:
                     ui.showErrors("Hmm I don't know that one~",
-                            "Try: todo, deadline, event, list, mark, unmark, delete, find, cheer, or bye!");
+                            "Try: todo, deadline, event, tentative,"
+                                    + " confirm, list, mark, unmark,"
+                                    + " delete, find, cheer, or bye!");
                     break;
                 }
             } catch (BobException e) {
@@ -234,6 +270,14 @@ public class Boba {
                 response.append(findAndRespond(args));
                 break;
 
+            case "tentative":
+                response.append(addTaskAndRespond(Parser.parseTentative(args)));
+                break;
+
+            case "confirm":
+                response.append(confirmSlotAndRespond(args));
+                break;
+
             case "cheer":
                 response.append("\u2728 " + cheerLoader.getRandomQuote()
                         + " \u2728");
@@ -241,8 +285,9 @@ public class Boba {
 
             default:
                 response.append("Hmm I don't know that one~\n");
-                response.append("Try: todo, deadline, event, list,"
-                        + " mark, unmark, delete, find, cheer, or bye!");
+                response.append("Try: todo, deadline, event, tentative,"
+                        + " confirm, list, mark, unmark, delete, find,"
+                        + " cheer, or bye!");
                 break;
             }
         } catch (BobException e) {
@@ -285,6 +330,29 @@ public class Boba {
             }
         }
         return sb.toString();
+    }
+
+    private String confirmSlotAndRespond(String args) throws BobException {
+        int[] confirmArgs = Parser.parseConfirm(args);
+        int taskIdx = confirmArgs[0];
+        int slotIdx = confirmArgs[1];
+
+        if (!isValidIndex(taskIdx)) {
+            return formatInvalidIndexError();
+        }
+        if (!(tasks.get(taskIdx) instanceof TentativeEvent)) {
+            return "That's not a tentative event~";
+        }
+        TentativeEvent te = (TentativeEvent) tasks.get(taskIdx);
+        if (slotIdx < 0 || slotIdx >= te.getSlotCount()) {
+            return "Invalid slot number!\nThis event has "
+                    + te.getSlotCount() + " slot(s).";
+        }
+        Event confirmed = te.confirm(slotIdx);
+        tasks.delete(taskIdx);
+        tasks.add(confirmed);
+        storage.save(tasks);
+        return "Confirmed! Your event is now set \u2728\n  " + confirmed;
     }
 
     private String findAndRespond(String keyword) {

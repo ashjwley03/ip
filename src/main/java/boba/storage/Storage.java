@@ -5,12 +5,14 @@ import boba.task.Deadline;
 import boba.task.Event;
 import boba.task.Task;
 import boba.task.TaskList;
+import boba.task.TentativeEvent;
 import boba.task.Todo;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -93,8 +95,14 @@ public class Storage {
             case "E":
                 task = new Event(description, parts[3], parts[4]);
                 break;
+            case "TE":
+                List<String[]> slots = new ArrayList<>();
+                for (int i = 3; i < parts.length; i += 2) {
+                    slots.add(new String[]{parts[i], parts[i + 1]});
+                }
+                task = new TentativeEvent(description, slots);
+                break;
             default:
-                // Unknown task type, will return null
                 break;
             }
 
@@ -148,6 +156,14 @@ public class Storage {
             Deadline d = (Deadline) task;
             return "D | " + status + " | " + description
                     + " | " + d.getByForStorage();
+        } else if (task instanceof TentativeEvent) {
+            TentativeEvent te = (TentativeEvent) task;
+            StringBuilder sb = new StringBuilder();
+            sb.append("TE | " + status + " | " + description);
+            for (String[] slot : te.getSlots()) {
+                sb.append(" | " + slot[0] + " | " + slot[1]);
+            }
+            return sb.toString();
         } else if (task instanceof Event) {
             Event e = (Event) task;
             return "E | " + status + " | " + description
