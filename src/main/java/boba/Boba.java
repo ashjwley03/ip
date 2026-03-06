@@ -5,6 +5,7 @@ import boba.parser.Parser;
 import boba.storage.Storage;
 import boba.task.Deadline;
 import boba.task.DoAfter;
+import boba.task.DoWithin;
 import boba.task.Event;
 import boba.task.Task;
 import boba.task.TaskList;
@@ -158,6 +159,12 @@ public class Boba {
             storage.save(tasks);
             ui.showTaskAdded(doAfter, tasks.size());
             break;
+        case "dowithin":
+            DoWithin doWithin = Parser.parseDoWithin(args);
+            tasks.add(doWithin);
+            storage.save(tasks);
+            ui.showTaskAdded(doWithin, tasks.size());
+            break;
         case "snooze":
             handleSnoozeRun(args);
             break;
@@ -176,9 +183,9 @@ public class Boba {
         default:
             ui.showErrors("Hmm I don't know that one~",
                     "Try: todo, deadline, event, doafter,"
-                            + " snooze, tentative, confirm, list,"
-                            + " mark, unmark, delete, find, cheer,"
-                            + " or bye!");
+                            + " dowithin, snooze, tentative,"
+                            + " confirm, list, mark, unmark,"
+                            + " delete, find, cheer, or bye!");
             break;
         }
     }
@@ -299,6 +306,11 @@ public class Boba {
                         addTaskAndRespond(Parser.parseDoAfter(args)));
                 break;
 
+            case "dowithin":
+                response.append(
+                        addTaskAndRespond(Parser.parseDoWithin(args)));
+                break;
+
             case "snooze":
                 response.append(snoozeAndRespond(args));
                 break;
@@ -319,8 +331,9 @@ public class Boba {
             default:
                 response.append("Hmm I don't know that one~\n");
                 response.append("Try: todo, deadline, event, doafter,"
-                        + " snooze, tentative, confirm, list, mark,"
-                        + " unmark, delete, find, cheer, or bye!");
+                        + " dowithin, snooze, tentative, confirm,"
+                        + " list, mark, unmark, delete, find,"
+                        + " cheer, or bye!");
                 break;
             }
         } catch (BobException e) {

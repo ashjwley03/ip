@@ -3,6 +3,7 @@ package boba.storage;
 import boba.exception.BobException;
 import boba.task.Deadline;
 import boba.task.DoAfter;
+import boba.task.DoWithin;
 import boba.task.Event;
 import boba.task.Task;
 import boba.task.TaskList;
@@ -108,6 +109,9 @@ public class Storage {
             case "DA":
                 task = new DoAfter(description, parts[3]);
                 break;
+            case "DW":
+                task = new DoWithin(description, parts[3], parts[4]);
+                break;
             case "TE":
                 List<String[]> slots = new ArrayList<>();
                 for (int i = 3; i < parts.length; i += 2) {
@@ -180,6 +184,11 @@ public class Storage {
             DoAfter da = (DoAfter) task;
             return "DA | " + status + " | " + description
                     + " | " + da.getAfter() + recSuffix;
+        } else if (task instanceof DoWithin) {
+            DoWithin dw = (DoWithin) task;
+            return "DW | " + status + " | " + description
+                    + " | " + dw.getStart() + " | " + dw.getEnd()
+                    + recSuffix;
         } else if (task instanceof TentativeEvent) {
             TentativeEvent te = (TentativeEvent) task;
             StringBuilder sb = new StringBuilder();

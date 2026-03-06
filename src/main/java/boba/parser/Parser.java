@@ -3,6 +3,7 @@ package boba.parser;
 import boba.exception.BobException;
 import boba.task.Deadline;
 import boba.task.DoAfter;
+import boba.task.DoWithin;
 import boba.task.Event;
 import boba.task.Task;
 import boba.task.TentativeEvent;
@@ -193,6 +194,40 @@ public class Parser {
         }
         return applyRecurrence(
                 new DoAfter(description, after), rec[1]);
+    }
+
+    /**
+     * Parses arguments to create a DoWithin task.
+     * Expected format: "description /between start /and end"
+     *
+     * @param args The arguments containing description and period.
+     * @return A new DoWithin task.
+     * @throws BobException If the format is invalid or fields missing.
+     */
+    public static DoWithin parseDoWithin(String args)
+            throws BobException {
+        String[] rec = extractRecurrence(args);
+        String cleaned = rec[0];
+        if (!cleaned.contains(" /between ") || !cleaned.contains(" /and ")) {
+            throw new BobException(
+                    "I need both /between and /and~\n"
+                    + "    Try: dowithin <description>"
+                    + " /between <start> /and <end>");
+        }
+        String[] parts = cleaned.split(" /between ", 2);
+        String description = parts[0].trim();
+        String[] periodParts = parts[1].split(" /and ", 2);
+        String start = periodParts[0].trim();
+        String end = periodParts[1].trim();
+        if (description.isEmpty() || start.isEmpty()
+                || end.isEmpty()) {
+            throw new BobException(
+                    "Hmm something's missing there~\n"
+                    + "    Try: dowithin <description>"
+                    + " /between <start> /and <end>");
+        }
+        return applyRecurrence(
+                new DoWithin(description, start, end), rec[1]);
     }
 
     /**
