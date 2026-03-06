@@ -16,6 +16,7 @@ import boba.ui.Ui;
 import boba.util.CheerLoader;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 
@@ -189,6 +190,9 @@ public class Boba {
         case "remind":
             ui.showError(getReminders());
             break;
+        case "freetime":
+            ui.showError(findFreeTimes(args));
+            break;
         case "cheer":
             ui.showCheer(cheerLoader.getRandomQuote());
             break;
@@ -197,8 +201,8 @@ public class Boba {
                     "Try: todo, deadline, event, doafter,"
                             + " dowithin, fixed, snooze,"
                             + " tentative, confirm, remind,"
-                            + " list, mark, unmark, delete,"
-                            + " find, cheer, or bye!");
+                            + " freetime, list, mark, unmark,"
+                            + " delete, find, cheer, or bye!");
             break;
         }
     }
@@ -346,6 +350,10 @@ public class Boba {
                 response.append(getReminders());
                 break;
 
+            case "freetime":
+                response.append(findFreeTimes(args));
+                break;
+
             case "cheer":
                 response.append("\u2728 " + cheerLoader.getRandomQuote()
                         + " \u2728");
@@ -355,8 +363,8 @@ public class Boba {
                 response.append("Hmm I don't know that one~\n");
                 response.append("Try: todo, deadline, event, doafter,"
                         + " dowithin, fixed, snooze, tentative,"
-                        + " confirm, remind, list, mark, unmark,"
-                        + " delete, find, cheer, or bye!");
+                        + " confirm, remind, freetime, list, mark,"
+                        + " unmark, delete, find, cheer, or bye!");
                 break;
             }
         } catch (BobException e) {
@@ -438,6 +446,103 @@ public class Boba {
             sb.append(String.join("\n", upcoming));
         }
         return sb.toString();
+    }
+
+    private String findFreeTimes(String args) {
+        int lookAheadDays = 7;
+        int requiredHours = 0;
+        boolean filterByHours = !args.isEmpty();
+
+        if (filterByHours) {
+            try {
+                requiredHours = Integer.parseInt(args.trim());
+                lookAheadDays = 14;
+            } catch (NumberFormatException e) {
+                return "That's not a valid number of hours~\n"
+                        + "    Try: freetime <hours> or just: freetime";
+            }
+            if (requiredHours < 1 || requiredHours > 14) {
+                return "Hours must be between 1 and 14~";
+            }
+        }
+
+        LocalDate today = LocalDate.now();
+        DateTimeFormatter dayFmt =
+                DateTimeFormatter.ofPattern("EEE, MMM d");
+        StringBuilder sb = new StringBuilder();
+
+        if (filterByHours) {
+            sb.append("\uD83D\uDD0D Looking for a day with "
+                    + requiredHours + "+ free hours...\n");
+        } else {
+            sb.append("\uD83D\uDCC5 Your schedule for the next 7"
+                    + " days:\n");
+        }
+
+        boolean found = false;
+        for (int d = 0; d < lookAheadDays; d++) {
+            LocalDate date = today.plus(d, ChronoUnit.DAYS);
+            String dateStr = date.toString();
+            ArrayList<String> dayTasks = getTasksForDate(date, dateStr);
+            int busyHours = dayTasks.size();
+            int freeHours = Math.max(0, 14 - busyHours);
+
+            if (filterByHours) {
+                if (freeHours >= requiredHours) {
+                    sb.append("\n\u2705 " + date.format(dayFmt));
+                    sb.append(" (~" + freeHours + "h free)");
+                    if (!dayTasks.isEmpty()) {
+                        sb.append("\n  Busy with:");
+                        for (String t : dayTasks) {
+                            sb.append("\n    " + t);
+                        }
+                    }
+                    found = true;
+                    break;
+                }
+            } else {
+                sb.append("\n" + date.format(dayFmt) + ":");
+                if (dayTasks.isEmpty()) {
+                    sb.append(" \u2705 Free!");
+                } else {
+                    for (String t : dayTasks) {
+                        sb.append("\n  " + t);
+                    }
+                    sb.append("\n  (~" + freeHours + "h free)");
+                }
+            }
+        }
+
+        if (filterByHours && !found) {
+            sb.append("\nNo day with " + requiredHours
+                    + "+ free hours found in the next "
+                    + lookAheadDays + " days~");
+        }
+
+        return sb.toString();
+    }
+
+    private ArrayList<String> getTasksForDate(
+            LocalDate date, String dateStr) {
+        ArrayList<String> dayTasks = new ArrayList<>();
+        for (int i = 0; i < tasks.size(); i++) {
+            Task task = tasks.get(i);
+            if (task.isDone()) {
+                continue;
+            }
+            if (task instanceof Event) {
+                Event ev = (Event) task;
+                if (ev.getFrom().contains(dateStr)) {
+                    dayTasks.add(task.toString());
+                }
+            } else if (task instanceof Deadline) {
+                Deadline dl = (Deadline) task;
+                if (dl.hasDate() && dl.getByDate().equals(date)) {
+                    dayTasks.add(task.toString());
+                }
+            }
+        }
+        return dayTasks;
     }
 
     private boolean isValidIndex(int index) {
