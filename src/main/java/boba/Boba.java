@@ -193,6 +193,9 @@ public class Boba {
         case "freetime":
             ui.showError(findFreeTimes(args));
             break;
+        case "schedule":
+            ui.showError(viewSchedule(args));
+            break;
         case "cheer":
             ui.showCheer(cheerLoader.getRandomQuote());
             break;
@@ -201,8 +204,9 @@ public class Boba {
                     "Try: todo, deadline, event, doafter,"
                             + " dowithin, fixed, snooze,"
                             + " tentative, confirm, remind,"
-                            + " freetime, list, mark, unmark,"
-                            + " delete, find, cheer, or bye!");
+                            + " freetime, schedule, list, mark,"
+                            + " unmark, delete, find, cheer,"
+                            + " or bye!");
             break;
         }
     }
@@ -354,6 +358,10 @@ public class Boba {
                 response.append(findFreeTimes(args));
                 break;
 
+            case "schedule":
+                response.append(viewSchedule(args));
+                break;
+
             case "cheer":
                 response.append("\u2728 " + cheerLoader.getRandomQuote()
                         + " \u2728");
@@ -363,8 +371,9 @@ public class Boba {
                 response.append("Hmm I don't know that one~\n");
                 response.append("Try: todo, deadline, event, doafter,"
                         + " dowithin, fixed, snooze, tentative,"
-                        + " confirm, remind, freetime, list, mark,"
-                        + " unmark, delete, find, cheer, or bye!");
+                        + " confirm, remind, freetime, schedule,"
+                        + " list, mark, unmark, delete, find,"
+                        + " cheer, or bye!");
                 break;
             }
         } catch (BobException e) {
@@ -543,6 +552,87 @@ public class Boba {
             }
         }
         return dayTasks;
+    }
+
+    private String viewSchedule(String args) {
+        LocalDate date;
+        if (args.isEmpty()) {
+            date = LocalDate.now();
+        } else {
+            try {
+                date = LocalDate.parse(args.trim());
+            } catch (Exception e) {
+                return "Invalid date format~\n"
+                        + "    Try: schedule yyyy-mm-dd\n"
+                        + "    Or just: schedule (for today)";
+            }
+        }
+
+        String dateStr = date.toString();
+        DateTimeFormatter displayFmt =
+                DateTimeFormatter.ofPattern("EEEE, MMM d yyyy");
+        StringBuilder sb = new StringBuilder();
+        sb.append("\uD83D\uDCC6 Schedule for "
+                + date.format(displayFmt) + "\n");
+
+        ArrayList<String> events = new ArrayList<>();
+        ArrayList<String> deadlines = new ArrayList<>();
+        ArrayList<String> others = new ArrayList<>();
+
+        for (int i = 0; i < tasks.size(); i++) {
+            Task task = tasks.get(i);
+            int num = i + 1;
+            String entry = num + "." + task;
+
+            if (task instanceof Event) {
+                Event ev = (Event) task;
+                if (ev.getFrom().contains(dateStr)) {
+                    events.add(entry);
+                }
+            } else if (task instanceof Deadline) {
+                Deadline dl = (Deadline) task;
+                if (dl.hasDate() && dl.getByDate().equals(date)) {
+                    deadlines.add(entry);
+                }
+            } else if (task instanceof DoWithin) {
+                DoWithin dw = (DoWithin) task;
+                if (dw.getStart().contains(dateStr)
+                        || dw.getEnd().contains(dateStr)) {
+                    others.add(entry);
+                }
+            }
+        }
+
+        boolean empty = events.isEmpty() && deadlines.isEmpty()
+                && others.isEmpty();
+        if (empty) {
+            sb.append("\n\u2705 Nothing scheduled! Enjoy your"
+                    + " free time~");
+            return sb.toString();
+        }
+
+        if (!events.isEmpty()) {
+            sb.append("\n\uD83D\uDDD3\uFE0F Events:");
+            for (String e : events) {
+                sb.append("\n  " + e);
+            }
+        }
+        if (!deadlines.isEmpty()) {
+            sb.append("\n\u23F0 Deadlines:");
+            for (String d : deadlines) {
+                sb.append("\n  " + d);
+            }
+        }
+        if (!others.isEmpty()) {
+            sb.append("\n\uD83D\uDCCB Other:");
+            for (String o : others) {
+                sb.append("\n  " + o);
+            }
+        }
+
+        int total = events.size() + deadlines.size() + others.size();
+        sb.append("\n\n" + total + " task(s) scheduled for this day.");
+        return sb.toString();
     }
 
     private boolean isValidIndex(int index) {
