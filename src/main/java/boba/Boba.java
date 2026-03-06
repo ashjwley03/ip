@@ -15,6 +15,8 @@ import boba.task.Todo;
 import boba.ui.Ui;
 import boba.util.CheerLoader;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 
 /**
@@ -184,6 +186,9 @@ public class Boba {
         case "confirm":
             handleConfirmRun(args);
             break;
+        case "remind":
+            ui.showError(getReminders());
+            break;
         case "cheer":
             ui.showCheer(cheerLoader.getRandomQuote());
             break;
@@ -191,9 +196,9 @@ public class Boba {
             ui.showErrors("Hmm I don't know that one~",
                     "Try: todo, deadline, event, doafter,"
                             + " dowithin, fixed, snooze,"
-                            + " tentative, confirm, list, mark,"
-                            + " unmark, delete, find, cheer,"
-                            + " or bye!");
+                            + " tentative, confirm, remind,"
+                            + " list, mark, unmark, delete,"
+                            + " find, cheer, or bye!");
             break;
         }
     }
@@ -337,6 +342,10 @@ public class Boba {
                 response.append(confirmSlotAndRespond(args));
                 break;
 
+            case "remind":
+                response.append(getReminders());
+                break;
+
             case "cheer":
                 response.append("\u2728 " + cheerLoader.getRandomQuote()
                         + " \u2728");
@@ -346,8 +355,8 @@ public class Boba {
                 response.append("Hmm I don't know that one~\n");
                 response.append("Try: todo, deadline, event, doafter,"
                         + " dowithin, fixed, snooze, tentative,"
-                        + " confirm, list, mark, unmark, delete,"
-                        + " find, cheer, or bye!");
+                        + " confirm, remind, list, mark, unmark,"
+                        + " delete, find, cheer, or bye!");
                 break;
             }
         } catch (BobException e) {
@@ -376,6 +385,59 @@ public class Boba {
             return ((Todo) task).createNextOccurrence(freq);
         }
         return null;
+    }
+
+    /**
+     * Returns a reminders string listing overdue and upcoming deadlines.
+     * Checks for overdue tasks and tasks due within the next 7 days.
+     *
+     * @return A formatted reminder string.
+     */
+    public String getReminders() {
+        LocalDate today = LocalDate.now();
+        LocalDate weekAhead = today.plus(7, ChronoUnit.DAYS);
+
+        ArrayList<String> overdue = new ArrayList<>();
+        ArrayList<String> upcoming = new ArrayList<>();
+
+        for (int i = 0; i < tasks.size(); i++) {
+            Task task = tasks.get(i);
+            if (task.isDone()) {
+                continue;
+            }
+            if (!(task instanceof Deadline)) {
+                continue;
+            }
+            Deadline d = (Deadline) task;
+            if (!d.hasDate()) {
+                continue;
+            }
+            LocalDate dueDate = d.getByDate();
+            int num = i + 1;
+            if (dueDate.isBefore(today)) {
+                overdue.add("  " + num + "." + d);
+            } else if (!dueDate.isAfter(weekAhead)) {
+                upcoming.add("  " + num + "." + d);
+            }
+        }
+
+        if (overdue.isEmpty() && upcoming.isEmpty()) {
+            return "\u2705 No urgent reminders! You're all caught up~";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        if (!overdue.isEmpty()) {
+            sb.append("\u26A0\uFE0F OVERDUE:\n");
+            sb.append(String.join("\n", overdue));
+        }
+        if (!upcoming.isEmpty()) {
+            if (!overdue.isEmpty()) {
+                sb.append("\n\n");
+            }
+            sb.append("\u23F0 Due within 7 days:\n");
+            sb.append(String.join("\n", upcoming));
+        }
+        return sb.toString();
     }
 
     private boolean isValidIndex(int index) {

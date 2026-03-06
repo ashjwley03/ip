@@ -46,6 +46,10 @@ public class MainWindow extends AnchorPane {
      */
     public void setBoba(Boba b) {
         boba = b;
+        String reminders = boba.getReminders();
+        if (!reminders.startsWith("\u2705")) {
+            addDialogs(DialogBox.getBobaDialog(reminders, bobaImage));
+        }
     }
 
     /**
