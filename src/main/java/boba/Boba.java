@@ -57,6 +57,9 @@ public class Boba {
 
         while (!isExit) {
             String input = ui.readCommand();
+            if (input.trim().isEmpty()) {
+                continue;
+            }
             String command = Parser.getCommand(input);
             String args = Parser.getArguments(input);
 
@@ -262,6 +265,10 @@ public class Boba {
      * @return The chatbot's response string.
      */
     public String getResponse(String input) {
+        if (input == null || input.trim().isEmpty()) {
+            return "Type something~ I can't read "
+                    + "blank bubbles!";
+        }
         String command = Parser.getCommand(input);
         String args = Parser.getArguments(input);
         StringBuilder response = new StringBuilder();

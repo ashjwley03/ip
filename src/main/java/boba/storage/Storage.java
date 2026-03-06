@@ -50,25 +50,50 @@ public class Storage {
 
         File parentDir = file.getParentFile();
         if (parentDir != null && !parentDir.exists()) {
-            parentDir.mkdirs();
+            if (!parentDir.mkdirs()) {
+                throw new BobException(
+                        "Couldn't create data directory: "
+                        + parentDir.getAbsolutePath());
+            }
         }
 
         if (!file.exists()) {
             return tasks;
         }
 
+        if (!file.canRead()) {
+            throw new BobException(
+                    "Can't read save file (permission denied): "
+                    + file.getAbsolutePath());
+        }
+
+        int lineNum = 0;
+        int skipped = 0;
         try {
             Scanner scanner = new Scanner(file);
             while (scanner.hasNextLine()) {
+                lineNum++;
                 String line = scanner.nextLine();
+                if (line.trim().isEmpty()) {
+                    continue;
+                }
                 Task task = parseTask(line);
                 if (task != null) {
                     tasks.add(task);
+                } else {
+                    skipped++;
                 }
             }
             scanner.close();
         } catch (IOException e) {
-            throw new BobException("Hmm couldn't load saved tasks~");
+            throw new BobException(
+                    "Hmm couldn't load saved tasks~\n"
+                    + "    Error: " + e.getMessage());
+        }
+
+        if (skipped > 0) {
+            System.out.println("    Warning: " + skipped
+                    + " corrupted line(s) skipped in save file.");
         }
 
         return tasks;
@@ -152,7 +177,18 @@ public class Storage {
 
             File parentDir = file.getParentFile();
             if (parentDir != null && !parentDir.exists()) {
-                parentDir.mkdirs();
+                if (!parentDir.mkdirs()) {
+                    System.out.println(
+                            "    Couldn't create data directory!");
+                    return;
+                }
+            }
+
+            if (file.exists() && !file.canWrite()) {
+                System.out.println(
+                        "    Can't write to save file"
+                        + " (permission denied)!");
+                return;
             }
 
             String content = IntStream.range(0, tasks.size())
@@ -162,7 +198,8 @@ public class Storage {
             writer.write(content);
             writer.close();
         } catch (IOException e) {
-            System.out.println("    Oops, couldn't save tasks~");
+            System.out.println("    Oops, couldn't save tasks: "
+                    + e.getMessage());
         }
     }
 
