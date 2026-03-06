@@ -47,6 +47,23 @@ public class Deadline extends Task {
     }
 
     /**
+     * Reschedules this deadline to a new date/time.
+     *
+     * @param newBy The new deadline date/time.
+     */
+    public void reschedule(String newBy) {
+        try {
+            this.byDate = LocalDate.parse(newBy);
+            this.hasDate = true;
+            this.byString = newBy;
+        } catch (DateTimeParseException e) {
+            this.byString = newBy;
+            this.hasDate = false;
+            this.byDate = null;
+        }
+    }
+
+    /**
      * Returns a string representation of this deadline task.
      * If the deadline is a valid date, it is displayed in "MMM d yyyy" format.
      *

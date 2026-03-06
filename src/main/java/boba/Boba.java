@@ -56,124 +56,10 @@ public class Boba {
             ui.showLine();
 
             try {
-                switch (command) {
-                case "bye":
+                if (command.equals("bye")) {
                     isExit = true;
-                    break;
-
-                case "list":
-                    ui.showTaskList(tasks);
-                    break;
-
-                case "mark":
-                    int markIndex = Parser.parseIndex(input);
-                    if (markIndex < 0 || markIndex >= tasks.size()) {
-                        ui.showErrors("Hmm that task doesn't exist!",
-                                "You have " + tasks.size() + " task(s) btw~");
-                    } else {
-                        tasks.get(markIndex).markAsDone();
-                        storage.save(tasks);
-                        ui.showTaskMarked(tasks.get(markIndex));
-                    }
-                    break;
-
-                case "unmark":
-                    int unmarkIndex = Parser.parseIndex(input);
-                    if (unmarkIndex < 0 || unmarkIndex >= tasks.size()) {
-                        ui.showErrors("Hmm that task doesn't exist!",
-                                "You have " + tasks.size() + " task(s) btw~");
-                    } else {
-                        tasks.get(unmarkIndex).markAsNotDone();
-                        storage.save(tasks);
-                        ui.showTaskUnmarked(tasks.get(unmarkIndex));
-                    }
-                    break;
-
-                case "todo":
-                    Todo todo = Parser.parseTodo(args);
-                    tasks.add(todo);
-                    storage.save(tasks);
-                    ui.showTaskAdded(todo, tasks.size());
-                    break;
-
-                case "deadline":
-                    Deadline deadline = Parser.parseDeadline(args);
-                    tasks.add(deadline);
-                    storage.save(tasks);
-                    ui.showTaskAdded(deadline, tasks.size());
-                    break;
-
-                case "event":
-                    Event event = Parser.parseEvent(args);
-                    tasks.add(event);
-                    storage.save(tasks);
-                    ui.showTaskAdded(event, tasks.size());
-                    break;
-
-                case "delete":
-                    int deleteIndex = Parser.parseIndex(input);
-                    if (deleteIndex < 0 || deleteIndex >= tasks.size()) {
-                        ui.showErrors("Hmm that task doesn't exist!",
-                                "You have " + tasks.size() + " task(s) btw~");
-                    } else {
-                        Task removed = tasks.delete(deleteIndex);
-                        storage.save(tasks);
-                        ui.showTaskDeleted(removed, tasks.size());
-                    }
-                    break;
-
-                case "find":
-                    if (args.isEmpty()) {
-                        ui.showErrors("What should I search for?~",
-                                "Try: find <keyword>");
-                    } else {
-                        ui.showFoundTasks(tasks.find(args));
-                    }
-                    break;
-
-                case "tentative":
-                    TentativeEvent tentEvent = Parser.parseTentative(args);
-                    tasks.add(tentEvent);
-                    storage.save(tasks);
-                    ui.showTaskAdded(tentEvent, tasks.size());
-                    break;
-
-                case "confirm":
-                    int[] confirmArgs = Parser.parseConfirm(args);
-                    int taskIdx = confirmArgs[0];
-                    int slotIdx = confirmArgs[1];
-                    if (taskIdx < 0 || taskIdx >= tasks.size()) {
-                        ui.showErrors("Hmm that task doesn't exist!",
-                                "You have " + tasks.size() + " task(s) btw~");
-                    } else if (!(tasks.get(taskIdx) instanceof TentativeEvent)) {
-                        ui.showError("That's not a tentative event~");
-                    } else {
-                        TentativeEvent te = (TentativeEvent) tasks.get(taskIdx);
-                        if (slotIdx < 0 || slotIdx >= te.getSlotCount()) {
-                            ui.showErrors("Invalid slot number!",
-                                    "This event has " + te.getSlotCount()
-                                            + " slot(s).");
-                        } else {
-                            Event confirmed = te.confirm(slotIdx);
-                            tasks.delete(taskIdx);
-                            tasks.add(confirmed);
-                            storage.save(tasks);
-                            ui.showError("Confirmed! Your event is now set:");
-                            ui.showError("  " + confirmed);
-                        }
-                    }
-                    break;
-
-                case "cheer":
-                    ui.showCheer(cheerLoader.getRandomQuote());
-                    break;
-
-                default:
-                    ui.showErrors("Hmm I don't know that one~",
-                            "Try: todo, deadline, event, tentative,"
-                                    + " confirm, list, mark, unmark,"
-                                    + " delete, find, cheer, or bye!");
-                    break;
+                } else {
+                    processCommandCli(command, args, input);
                 }
             } catch (BobException e) {
                 ui.showError(e.getMessage());
@@ -192,6 +78,122 @@ public class Boba {
 
         ui.showGoodbye();
         ui.close();
+    }
+
+    private void processCommandCli(String command, String args, String input)
+            throws BobException {
+        switch (command) {
+        case "list":
+            ui.showTaskList(tasks);
+            break;
+        case "mark":
+            int markIndex = Parser.parseIndex(input);
+            if (markIndex < 0 || markIndex >= tasks.size()) {
+                ui.showErrors("Hmm that task doesn't exist!",
+                        "You have " + tasks.size() + " task(s) btw~");
+            } else {
+                tasks.get(markIndex).markAsDone();
+                storage.save(tasks);
+                ui.showTaskMarked(tasks.get(markIndex));
+            }
+            break;
+        case "unmark":
+            int unmarkIndex = Parser.parseIndex(input);
+            if (unmarkIndex < 0 || unmarkIndex >= tasks.size()) {
+                ui.showErrors("Hmm that task doesn't exist!",
+                        "You have " + tasks.size() + " task(s) btw~");
+            } else {
+                tasks.get(unmarkIndex).markAsNotDone();
+                storage.save(tasks);
+                ui.showTaskUnmarked(tasks.get(unmarkIndex));
+            }
+            break;
+        case "todo":
+            Todo todo = Parser.parseTodo(args);
+            tasks.add(todo);
+            storage.save(tasks);
+            ui.showTaskAdded(todo, tasks.size());
+            break;
+        case "deadline":
+            Deadline deadline = Parser.parseDeadline(args);
+            tasks.add(deadline);
+            storage.save(tasks);
+            ui.showTaskAdded(deadline, tasks.size());
+            break;
+        case "event":
+            Event event = Parser.parseEvent(args);
+            tasks.add(event);
+            storage.save(tasks);
+            ui.showTaskAdded(event, tasks.size());
+            break;
+        case "delete":
+            int deleteIndex = Parser.parseIndex(input);
+            if (deleteIndex < 0 || deleteIndex >= tasks.size()) {
+                ui.showErrors("Hmm that task doesn't exist!",
+                        "You have " + tasks.size() + " task(s) btw~");
+            } else {
+                Task removed = tasks.delete(deleteIndex);
+                storage.save(tasks);
+                ui.showTaskDeleted(removed, tasks.size());
+            }
+            break;
+        case "find":
+            if (args.isEmpty()) {
+                ui.showErrors("What should I search for?~",
+                        "Try: find <keyword>");
+            } else {
+                ui.showFoundTasks(tasks.find(args));
+            }
+            break;
+        case "snooze":
+            handleSnoozeRun(args);
+            break;
+        case "tentative":
+            TentativeEvent tentEvent = Parser.parseTentative(args);
+            tasks.add(tentEvent);
+            storage.save(tasks);
+            ui.showTaskAdded(tentEvent, tasks.size());
+            break;
+        case "confirm":
+            handleConfirmRun(args);
+            break;
+        case "cheer":
+            ui.showCheer(cheerLoader.getRandomQuote());
+            break;
+        default:
+            ui.showErrors("Hmm I don't know that one~",
+                    "Try: todo, deadline, event, snooze,"
+                            + " tentative, confirm, list, mark,"
+                            + " unmark, delete, find, cheer,"
+                            + " or bye!");
+            break;
+        }
+    }
+
+    private void handleConfirmRun(String args) throws BobException {
+        int[] confirmArgs = Parser.parseConfirm(args);
+        int taskIdx = confirmArgs[0];
+        int slotIdx = confirmArgs[1];
+        if (taskIdx < 0 || taskIdx >= tasks.size()) {
+            ui.showErrors("Hmm that task doesn't exist!",
+                    "You have " + tasks.size() + " task(s) btw~");
+        } else if (!(tasks.get(taskIdx) instanceof TentativeEvent)) {
+            ui.showError("That's not a tentative event~");
+        } else {
+            TentativeEvent te = (TentativeEvent) tasks.get(taskIdx);
+            if (slotIdx < 0 || slotIdx >= te.getSlotCount()) {
+                ui.showErrors("Invalid slot number!",
+                        "This event has " + te.getSlotCount()
+                                + " slot(s).");
+            } else {
+                Event confirmed = te.confirm(slotIdx);
+                tasks.delete(taskIdx);
+                tasks.add(confirmed);
+                storage.save(tasks);
+                ui.showError("Confirmed! Your event is now set:");
+                ui.showError("  " + confirmed);
+            }
+        }
     }
 
     /**
@@ -270,6 +272,10 @@ public class Boba {
                 response.append(findAndRespond(args));
                 break;
 
+            case "snooze":
+                response.append(snoozeAndRespond(args));
+                break;
+
             case "tentative":
                 response.append(addTaskAndRespond(Parser.parseTentative(args)));
                 break;
@@ -285,9 +291,9 @@ public class Boba {
 
             default:
                 response.append("Hmm I don't know that one~\n");
-                response.append("Try: todo, deadline, event, tentative,"
-                        + " confirm, list, mark, unmark, delete, find,"
-                        + " cheer, or bye!");
+                response.append("Try: todo, deadline, event, snooze,"
+                        + " tentative, confirm, list, mark, unmark,"
+                        + " delete, find, cheer, or bye!");
                 break;
             }
         } catch (BobException e) {
@@ -330,6 +336,77 @@ public class Boba {
             }
         }
         return sb.toString();
+    }
+
+    private void handleSnoozeRun(String args) throws BobException {
+        boolean isEventSnooze = args.contains(" /from ");
+        if (isEventSnooze) {
+            String[] parsed = Parser.parseSnoozeEvent(args);
+            int idx = Integer.parseInt(parsed[0]);
+            if (idx < 0 || idx >= tasks.size()) {
+                ui.showErrors("Hmm that task doesn't exist!",
+                        "You have " + tasks.size() + " task(s) btw~");
+            } else if (!(tasks.get(idx) instanceof Event)) {
+                ui.showError("That's not an event task~");
+            } else {
+                Event e = (Event) tasks.get(idx);
+                e.reschedule(parsed[1], parsed[2]);
+                storage.save(tasks);
+                ui.showError("Snoozed! Here's the updated task:");
+                ui.showError("  " + e);
+            }
+        } else {
+            String[] parsed = Parser.parseSnoozeDeadline(args);
+            int idx = Integer.parseInt(parsed[0]);
+            if (idx < 0 || idx >= tasks.size()) {
+                ui.showErrors("Hmm that task doesn't exist!",
+                        "You have " + tasks.size() + " task(s) btw~");
+            } else if (!(tasks.get(idx) instanceof Deadline)) {
+                ui.showError("That's not a deadline task~\n"
+                        + "For events: snooze <task#> /from <start>"
+                        + " /to <end>");
+            } else {
+                Deadline d = (Deadline) tasks.get(idx);
+                d.reschedule(parsed[1]);
+                storage.save(tasks);
+                ui.showError("Snoozed! Here's the updated task:");
+                ui.showError("  " + d);
+            }
+        }
+    }
+
+    private String snoozeAndRespond(String args) throws BobException {
+        boolean isEventSnooze = args.contains(" /from ");
+
+        if (isEventSnooze) {
+            String[] parsed = Parser.parseSnoozeEvent(args);
+            int idx = Integer.parseInt(parsed[0]);
+            if (!isValidIndex(idx)) {
+                return formatInvalidIndexError();
+            }
+            if (!(tasks.get(idx) instanceof Event)) {
+                return "That's not an event task~";
+            }
+            Event e = (Event) tasks.get(idx);
+            e.reschedule(parsed[1], parsed[2]);
+            storage.save(tasks);
+            return "Snoozed! Here's the updated task \u23F0\n  " + e;
+        } else {
+            String[] parsed = Parser.parseSnoozeDeadline(args);
+            int idx = Integer.parseInt(parsed[0]);
+            if (!isValidIndex(idx)) {
+                return formatInvalidIndexError();
+            }
+            if (!(tasks.get(idx) instanceof Deadline)) {
+                return "That's not a deadline task~\n"
+                        + "For events: snooze <task#>"
+                        + " /from <start> /to <end>";
+            }
+            Deadline d = (Deadline) tasks.get(idx);
+            d.reschedule(parsed[1]);
+            storage.save(tasks);
+            return "Snoozed! Here's the updated task \u23F0\n  " + d;
+        }
     }
 
     private String confirmSlotAndRespond(String args) throws BobException {

@@ -39,6 +39,17 @@ public class Event extends Task {
     }
 
     /**
+     * Reschedules this event to a new time range.
+     *
+     * @param newFrom The new start time.
+     * @param newTo The new end time.
+     */
+    public void reschedule(String newFrom, String newTo) {
+        this.from = newFrom;
+        this.to = newTo;
+    }
+
+    /**
      * Returns a string representation of this event task.
      *
      * @return A string in the format "[E][status] description (from: start to: end)".

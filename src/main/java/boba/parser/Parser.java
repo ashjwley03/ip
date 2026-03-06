@@ -119,6 +119,69 @@ public class Parser {
     }
 
     /**
+     * Parses a snooze command for a Deadline task.
+     * Expected format: "<taskIndex> /to <newDate>"
+     *
+     * @param args The arguments after the snooze command.
+     * @return A String array of [taskIndex (0-based as string), newDate].
+     * @throws BobException If the format is invalid.
+     */
+    public static String[] parseSnoozeDeadline(String args)
+            throws BobException {
+        if (!args.contains(" /to ")) {
+            throw new BobException(
+                    "When should I reschedule it to?~\n"
+                    + "    Deadline: snooze <task#> /to <new date>\n"
+                    + "    Event: snooze <task#> /from <start>"
+                    + " /to <end>");
+        }
+        String[] parts = args.split(" /to ", 2);
+        String indexStr = parts[0].trim();
+        String newDate = parts[1].trim();
+        if (newDate.isEmpty()) {
+            throw new BobException("The new date can't be empty~");
+        }
+        try {
+            int index = Integer.parseInt(indexStr) - 1;
+            return new String[]{String.valueOf(index), newDate};
+        } catch (NumberFormatException e) {
+            throw new BobException("That's not a valid task number~\n"
+                    + "    Try: snooze <task#> /to <new date>");
+        }
+    }
+
+    /**
+     * Parses a snooze command for an Event task.
+     * Expected format: "<taskIndex> /from <newFrom> /to <newTo>"
+     *
+     * @param args The arguments after the snooze command.
+     * @return A String array of [taskIndex (0-based as string), from, to].
+     * @throws BobException If the format is invalid.
+     */
+    public static String[] parseSnoozeEvent(String args)
+            throws BobException {
+        String[] parts = args.split(" /from ", 2);
+        String indexStr = parts[0].trim();
+        String[] timeParts = parts[1].split(" /to ", 2);
+        String newFrom = timeParts[0].trim();
+        String newTo = timeParts[1].trim();
+        if (newFrom.isEmpty() || newTo.isEmpty()) {
+            throw new BobException(
+                    "Both /from and /to are needed~\n"
+                    + "    Try: snooze <task#> /from <start>"
+                    + " /to <end>");
+        }
+        try {
+            int index = Integer.parseInt(indexStr) - 1;
+            return new String[]{String.valueOf(index), newFrom, newTo};
+        } catch (NumberFormatException e) {
+            throw new BobException("That's not a valid task number~\n"
+                    + "    Try: snooze <task#> /from <start>"
+                    + " /to <end>");
+        }
+    }
+
+    /**
      * Parses arguments to create a TentativeEvent.
      * Expected format: "description /slot from1 - to1 /slot from2 - to2 ..."
      *
