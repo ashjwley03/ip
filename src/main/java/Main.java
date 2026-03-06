@@ -22,8 +22,13 @@ public class Main extends Application {
                     Main.class.getResource("/view/MainWindow.fxml"));
             AnchorPane ap = fxmlLoader.load();
             Scene scene = new Scene(ap);
+            scene.getStylesheets().add(
+                    Main.class.getResource(
+                            "/view/style.css").toExternalForm());
             stage.setScene(scene);
-            stage.setTitle("Boba - Your Bubbly Assistant");
+            stage.setTitle("Boba");
+            stage.setMinWidth(350);
+            stage.setMinHeight(400);
             fxmlLoader.<MainWindow>getController().setBoba(boba);
             stage.show();
         } catch (IOException e) {

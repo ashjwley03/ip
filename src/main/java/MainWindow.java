@@ -23,24 +23,23 @@ public class MainWindow extends AnchorPane {
 
     private Boba boba;
 
-    private Image userImage = new Image(this.getClass().getResourceAsStream("/images/User.png"));
-    private Image bobaImage = new Image(this.getClass().getResourceAsStream("/images/Boba.png"));
+    private Image userImage = new Image(
+            this.getClass().getResourceAsStream("/images/User.png"));
+    private Image bobaImage = new Image(
+            this.getClass().getResourceAsStream("/images/Boba.png"));
 
-    /**
-     * Initializes the controller. Binds the scroll pane to auto-scroll
-     * and shows a welcome message from Boba.
-     */
     @FXML
     public void initialize() {
-        scrollPane.vvalueProperty().bind(dialogContainer.heightProperty());
-        dialogContainer.getChildren().add(
-                DialogBox.getBobaDialog(
-                        "Hii! I'm Boba \u25D5\u203F\u25D5\nWhat can I do for you today?",
-                        bobaImage));
+        scrollPane.vvalueProperty().bind(
+                dialogContainer.heightProperty());
+        addDialogs(DialogBox.getBobaDialog(
+                "Hii! I'm Boba \u25D5\u203F\u25D5\n"
+                        + "What can I do for you today?",
+                bobaImage));
     }
 
     /**
-     * Injects the Boba instance.
+     * Injects the Boba instance and shows startup reminders.
      *
      * @param b The Boba chatbot instance.
      */
@@ -48,31 +47,40 @@ public class MainWindow extends AnchorPane {
         boba = b;
         String reminders = boba.getReminders();
         if (!reminders.startsWith("\u2705")) {
-            addDialogs(DialogBox.getBobaDialog(reminders, bobaImage));
+            addDialogs(DialogBox.getBobaDialog(
+                    reminders, bobaImage));
         }
     }
 
-    /**
-     * Adds one or more dialog boxes to the dialog container.
-     *
-     * @param dialogs The dialog boxes to add.
-     */
     private void addDialogs(DialogBox... dialogs) {
         dialogContainer.getChildren().addAll(dialogs);
     }
 
-    /**
-     * Creates two dialog boxes, one echoing user input and the other containing
-     * Boba's reply, and then appends them to the dialog container.
-     * Clears the user input after processing.
-     */
+    private boolean isErrorResponse(String response) {
+        return response.startsWith("Hmm")
+                || response.startsWith("Invalid")
+                || response.startsWith("That's not")
+                || response.startsWith("What should");
+    }
+
     @FXML
     private void handleUserInput() {
         String input = userInput.getText();
+        if (input.isBlank()) {
+            return;
+        }
         String response = boba.getResponse(input);
+        DialogBox bobaBox;
+        if (isErrorResponse(response)) {
+            bobaBox = DialogBox.getBobaErrorDialog(
+                    response, bobaImage);
+        } else {
+            bobaBox = DialogBox.getBobaDialog(
+                    response, bobaImage);
+        }
         addDialogs(
                 DialogBox.getUserDialog(input, userImage),
-                DialogBox.getBobaDialog(response, bobaImage)
+                bobaBox
         );
         userInput.clear();
     }
