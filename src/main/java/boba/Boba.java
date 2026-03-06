@@ -86,6 +86,13 @@ public class Boba {
         ui.close();
     }
 
+    private void showAnomalyWarningsCli(Task task) {
+        String warnings = detectAnomalies(task);
+        if (!warnings.isEmpty()) {
+            ui.showError(warnings);
+        }
+    }
+
     private void processCommandCli(String command, String args, String input)
             throws BobException {
         switch (command) {
@@ -122,18 +129,21 @@ public class Boba {
             break;
         case "todo":
             Todo todo = Parser.parseTodo(args);
+            showAnomalyWarningsCli(todo);
             tasks.add(todo);
             storage.save(tasks);
             ui.showTaskAdded(todo, tasks.size());
             break;
         case "deadline":
             Deadline deadline = Parser.parseDeadline(args);
+            showAnomalyWarningsCli(deadline);
             tasks.add(deadline);
             storage.save(tasks);
             ui.showTaskAdded(deadline, tasks.size());
             break;
         case "event":
             Event event = Parser.parseEvent(args);
+            showAnomalyWarningsCli(event);
             tasks.add(event);
             storage.save(tasks);
             ui.showTaskAdded(event, tasks.size());
@@ -159,18 +169,21 @@ public class Boba {
             break;
         case "doafter":
             DoAfter doAfter = Parser.parseDoAfter(args);
+            showAnomalyWarningsCli(doAfter);
             tasks.add(doAfter);
             storage.save(tasks);
             ui.showTaskAdded(doAfter, tasks.size());
             break;
         case "dowithin":
             DoWithin doWithin = Parser.parseDoWithin(args);
+            showAnomalyWarningsCli(doWithin);
             tasks.add(doWithin);
             storage.save(tasks);
             ui.showTaskAdded(doWithin, tasks.size());
             break;
         case "fixed":
             FixedDuration fd = Parser.parseFixedDuration(args);
+            showAnomalyWarningsCli(fd);
             tasks.add(fd);
             storage.save(tasks);
             ui.showTaskAdded(fd, tasks.size());
@@ -180,6 +193,7 @@ public class Boba {
             break;
         case "tentative":
             TentativeEvent tentEvent = Parser.parseTentative(args);
+            showAnomalyWarningsCli(tentEvent);
             tasks.add(tentEvent);
             storage.save(tasks);
             ui.showTaskAdded(tentEvent, tasks.size());
@@ -645,11 +659,103 @@ public class Boba {
     }
 
     private String addTaskAndRespond(Task task) {
+        String warnings = detectAnomalies(task);
         tasks.add(task);
         storage.save(tasks);
-        return "Got it! I've added this task \u273F\n"
+        String base = "Got it! I've added this task \u273F\n"
                 + "  " + task + "\n"
-                + "Now you have " + tasks.size() + " task(s) in the list~";
+                + "Now you have " + tasks.size()
+                + " task(s) in the list~";
+        if (!warnings.isEmpty()) {
+            return base + "\n\n" + warnings;
+        }
+        return base;
+    }
+
+    private String detectAnomalies(Task newTask) {
+        ArrayList<String> warnings = new ArrayList<>();
+
+        checkDuplicateDescription(newTask, warnings);
+
+        if (newTask instanceof Event) {
+            checkEventClash((Event) newTask, warnings);
+        }
+        if (newTask instanceof Deadline) {
+            checkPastDeadline((Deadline) newTask, warnings);
+        }
+
+        if (warnings.isEmpty()) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder(
+                "\u26A0\uFE0F Heads up:");
+        for (String w : warnings) {
+            sb.append("\n  \u2022 " + w);
+        }
+        return sb.toString();
+    }
+
+    private void checkDuplicateDescription(
+            Task newTask, ArrayList<String> warnings) {
+        String desc = newTask.getDescription().toLowerCase();
+        for (int i = 0; i < tasks.size(); i++) {
+            Task existing = tasks.get(i);
+            if (!existing.isDone()
+                    && existing.getDescription().toLowerCase()
+                            .equals(desc)) {
+                warnings.add("Duplicate? Task " + (i + 1)
+                        + " has the same description.");
+                break;
+            }
+        }
+    }
+
+    private void checkEventClash(
+            Event newEvent, ArrayList<String> warnings) {
+        String newFrom = newEvent.getFrom();
+        for (int i = 0; i < tasks.size(); i++) {
+            Task existing = tasks.get(i);
+            if (existing.isDone() || !(existing instanceof Event)) {
+                continue;
+            }
+            Event ex = (Event) existing;
+            if (hasTimeOverlap(newFrom, newEvent.getTo(),
+                    ex.getFrom(), ex.getTo())) {
+                warnings.add("Clash with task " + (i + 1)
+                        + ": " + ex.getDescription()
+                        + " (from: " + ex.getFrom()
+                        + " to: " + ex.getTo() + ")");
+            }
+        }
+    }
+
+    private boolean hasTimeOverlap(String from1, String to1,
+            String from2, String to2) {
+        if (from1.length() >= 10 && from2.length() >= 10) {
+            String date1 = from1.substring(0, 10);
+            String date2 = from2.substring(0, 10);
+            if (!date1.equals(date2)) {
+                return false;
+            }
+        }
+        if (from1.equals(from2)) {
+            return true;
+        }
+        if (from1.length() > 10 && from2.length() > 10
+                && to1.length() > 0 && to2.length() > 0) {
+            return from1.compareTo(to2) < 0
+                    && from2.compareTo(to1) < 0;
+        }
+        return false;
+    }
+
+    private void checkPastDeadline(
+            Deadline newDl, ArrayList<String> warnings) {
+        if (newDl.hasDate()
+                && newDl.getByDate().isBefore(LocalDate.now())) {
+            warnings.add("This deadline is already past ("
+                    + newDl.getByDate() + ")!");
+        }
     }
 
     private String formatTaskList() {
@@ -753,9 +859,15 @@ public class Boba {
         }
         Event confirmed = te.confirm(slotIdx);
         tasks.delete(taskIdx);
+        String warnings = detectAnomalies(confirmed);
         tasks.add(confirmed);
         storage.save(tasks);
-        return "Confirmed! Your event is now set \u2728\n  " + confirmed;
+        String base = "Confirmed! Your event is now set \u2728\n  "
+                + confirmed;
+        if (!warnings.isEmpty()) {
+            return base + "\n\n" + warnings;
+        }
+        return base;
     }
 
     private String findAndRespond(String keyword) {
