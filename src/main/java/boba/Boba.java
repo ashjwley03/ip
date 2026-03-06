@@ -689,29 +689,12 @@ public class Boba {
     }
 
     private String getUnknownCommandMessage() {
-        return "Hmm that's not on the menu~ Here's what I"
-                + " know:\n\n"
-                + "\uD83D\uDCDD Add tasks:\n"
-                + "  todo <desc>\n"
-                + "  deadline <desc> /by <date>\n"
-                + "  event <desc> /from <start> /to <end>\n"
-                + "  doafter <desc> /after <condition>\n"
-                + "  dowithin <desc> /between <start>"
-                + " /and <end>\n"
-                + "  fixed <desc> /needs <duration>\n"
-                + "  tentative <desc> /slot <from>-<to>"
-                + " /slot <from>-<to>\n\n"
-                + "\u2705 Manage tasks:\n"
-                + "  list | mark <#> | unmark <#>"
-                + " | delete <#>\n"
-                + "  find <keyword> | snooze <#> /to"
-                + " <date>\n"
-                + "  confirm <#> /slot <#>\n\n"
-                + "\uD83D\uDCC5 View & plan:\n"
-                + "  schedule [date] | freetime [hours]"
-                + " | remind\n\n"
-                + "\uD83C\uDF1F Fun:\n"
-                + "  boba | cheer | bye";
+        return "Hmm that's not on the menu~\n"
+                + "Try: todo, deadline, event, doafter,"
+                + " dowithin, fixed, snooze, tentative,"
+                + " confirm, remind, freetime, schedule,"
+                + " list, mark, unmark, delete, find,"
+                + " boba, cheer, or bye!";
     }
 
     private String addTaskAndRespond(Task task) {
