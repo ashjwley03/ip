@@ -16,8 +16,11 @@ import boba.ui.Ui;
 import boba.util.CheerLoader;
 
 import java.time.LocalDate;
+import java.time.Month;
 import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
 import java.time.temporal.ChronoUnit;
+import java.util.Locale;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -529,6 +532,25 @@ public class Boba {
         return sb.toString();
     }
 
+    private boolean eventMatchesDate(String from, LocalDate date) {
+        String dateStr = date.toString();
+        if (from.contains(dateStr)) {
+            return true;
+        }
+        String lower = from.toLowerCase();
+        int day = date.getDayOfMonth();
+        Month month = date.getMonth();
+        String monthFull = month.getDisplayName(
+                TextStyle.FULL, Locale.ENGLISH).toLowerCase();
+        String monthShort = month.getDisplayName(
+                TextStyle.SHORT, Locale.ENGLISH).toLowerCase();
+
+        boolean hasDay = lower.contains(String.valueOf(day));
+        boolean hasMonth = lower.contains(monthFull)
+                || lower.contains(monthShort);
+        return hasDay && hasMonth;
+    }
+
     private ArrayList<String> getTasksForDate(
             LocalDate date, String dateStr) {
         ArrayList<String> dayTasks = new ArrayList<>();
@@ -539,7 +561,7 @@ public class Boba {
             }
             if (task instanceof Event) {
                 Event ev = (Event) task;
-                if (ev.getFrom().contains(dateStr)) {
+                if (eventMatchesDate(ev.getFrom(), date)) {
                     dayTasks.add(task.toString());
                 }
             } else if (task instanceof Deadline) {
@@ -584,7 +606,7 @@ public class Boba {
 
             if (task instanceof Event) {
                 Event ev = (Event) task;
-                if (ev.getFrom().contains(dateStr)) {
+                if (eventMatchesDate(ev.getFrom(), date)) {
                     events.add(entry);
                 }
             } else if (task instanceof Deadline) {
@@ -594,8 +616,9 @@ public class Boba {
                 }
             } else if (task instanceof DoWithin) {
                 DoWithin dw = (DoWithin) task;
-                if (dw.getStart().contains(dateStr)
-                        || dw.getEnd().contains(dateStr)) {
+                if (eventMatchesDate(dw.getStart(), date)
+                        || eventMatchesDate(
+                                dw.getEnd(), date)) {
                     others.add(entry);
                 }
             }

@@ -1,4 +1,2 @@
-E | 0 | team meeting | Wed 10am | 12pm
-T | 1 | laundry
-D | 0 | launtry | 34/6
-DW | 0 | laundry | 5/3 | 8/3
+T | 0 | laundry
+E | 0 | birthday party | 6th March 5pm | 7pm
