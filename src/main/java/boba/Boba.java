@@ -962,16 +962,16 @@ public class Boba {
             {"Taro Milk Tea", "Creamy purple goodness~ "
                     + "sweet and nutty like a hug in a cup."},
             {"Matcha Latte with Boba", "Earthy meets chewy! "
-                    + "For when you need zen AND energy."},
-            {"Mango Pomelo Sago", "Tropical, fruity, refreshing "
+                    + "For when you need zen and energy."},
+            {"Mango Pomelo Sago with jelly", "Tropical, fruity, refreshing "
                     + "-- perfect for a sunny day!"},
-            {"Oolong Milk Tea", "Smooth and fragrant~ "
+            {"Oolong Milk Tea with Boba", "Smooth and fragrant~ "
                     + "a sophisticated sip for the refined palate."},
-            {"Strawberry Jasmine Tea", "Floral and berry-sweet~ "
+            {"Strawberry Jasmine Tea with Jelly", "Floral and berry-sweet~ "
                     + "like spring in a cup!"},
             {"Thai Milk Tea", "Bold and spiced with that "
                     + "gorgeous sunset-orange color!"},
-            {"Wintermelon Lemon", "Cool and citrusy~ "
+            {"Wintermelon tea with white pearl", "Cool and citrusy~ "
                     + "when life gives you lemons, add boba!"},
             {"Honeydew Slush", "Icy melon bliss~ "
                     + "brain freeze never tasted so good."},
